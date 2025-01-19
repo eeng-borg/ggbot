@@ -1,0 +1,18 @@
+/vscode/
+/build/
+/.pytest_cache/
+/dist/
+/.vscode/
+
+# Cache directories
+__pycache__/
+*.pyc
+
+.env
+.project
+.pydevproject
+
+main.spec
+pomysły_todo
+
+
