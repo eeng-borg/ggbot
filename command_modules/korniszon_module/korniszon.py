@@ -13,6 +13,9 @@ def check_symbol(symbol):
             return 'Vowel'
         else:
             return "Letter"
+    elif symbol == " ":
+        return "Space"
+    
     else:
         return "Other"
     
@@ -20,7 +23,7 @@ def korniszon_cleanup(driver, korniszon_text):
 
     korniszon_text = korniszon_text.lower() # make words lowercase so they look better
     korniszon_text = korniszon_text.rstrip() # remove spaces after string, so there are no doubles counted as diffrent word with spaces at the end
-    korniszon_text = ''.join([char for char in korniszon_text if char.isalpha() or " "]) # clear the word from anything else than letters and spaces
+    korniszon_text = ''.join([char for char in korniszon_text if char.isalpha() or char == " "]) # clear the word from anything else than letters and spaces
     
  
     return korniszon_text
@@ -29,7 +32,7 @@ def korniszon_cleanup(driver, korniszon_text):
 def score_characters_value(score, korniszon_text):
     for char in korniszon_text:
 
-        if check_symbol(char) == 'Letter' or 'Vowel':
+        if check_symbol(char) == 'Letter' or 'Vowel' or "Space":
             rand = random.randint(9, 15)
             char_score = ord(char) % rand
             score += char_score * 2
@@ -170,7 +173,7 @@ def korniszon(driver, korniszon_text):
         response = f"{random.randint(-784545, -3456)} punktów <zniesmaczony>. Naum się w korniszony!"
         return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
     
-    elif len(korniszon_text) > 20:
+    elif len(korniszon_text) > 30:
         response = "Nie będę oceniał takiego długasa <nono>"
         return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
     
