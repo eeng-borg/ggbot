@@ -26,14 +26,14 @@ class Leaderboard:
 
         except json.JSONDecodeError:
             print("Błąd JSON! Resetuję leaderboard.")
-            self.leaderboard = {}
+            # self.leaderboard = {}
 
-    # returns list too
+
     def new_korniszon(self, korniszon_text, score):
 
         # add new result
         self.leaderboard[korniszon_text] = score
-        print("add new result:  {self.leaderboard}")
+        # print(f"add new result:  {self.leaderboard}")
 
         # sort
         leaderboard_sorted = dict(sorted(self.leaderboard.items(), key=lambda item: item[1], reverse=True))

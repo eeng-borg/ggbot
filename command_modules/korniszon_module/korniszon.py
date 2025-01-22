@@ -203,16 +203,13 @@ def korniszon(driver, korniszon_text, leaderboard):
     print(f"Len score: {round(score, 2)}")
     print('---')
 
-    def score_odd_even(score, korniszon_text):
-        modulo_res = len(korniszon_text) % 2
-        score += modulo_res * 2
 
-
-    # add new position to leaderboard, do it after calculating it score
+    # add new position to leaderboard, do it after calculating score
     leaderboard.new_korniszon(korniszon_text, score)
 
     # send the message on gg how much point your korniszon earned and what position it has on leaderbord
     position = leaderboard.get_position(korniszon_text)
+
     send_results(driver, score, korniszon_text, position)
     print(f"Full score: {round(score, 2)}")
 

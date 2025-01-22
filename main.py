@@ -10,8 +10,6 @@ from innitBot import initBot
 
 from command_modules.binguj import binguj
 from command_modules.bingusGpt import bingusGpt
-from command_modules.zaczepiacz import zaczepiacz
-from command_modules.help import help
 from command_modules.korniszon_module.korniszon import korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from command import Command
@@ -34,8 +32,8 @@ except Exception as e:
     print(f"Error initializing the Chrome driver: {e}")
     exit(1)
 
-# initialize bot
-initBot(driver)
+# initialize bot and return tabs
+tabs = initBot(driver)
 
 
 # for testing purposes automatically send command
@@ -56,48 +54,58 @@ leaderboard = Leaderboard()
 while(True):
     # try to catch exceptions if command is found
     try:
-            # check if binguj command is found and execute it
 
-        if binguj_command.find_commands_and_nick():
-            for prompt in binguj_command.find_commands_and_nick(): # prompt returns a list of tuples with prompt and nickname
-                binguj(driver, prompt)  # Call Binguj function with the command as an argument
-        
-        # check if chatgpt command is found and execute it
-        elif bingus_gpt_command.find_commands_and_nick():
-            for prompt in bingus_gpt_command.find_commands_and_nick():
-                bingusGpt(driver, prompt)
-        
-        elif korniszon_command.find_commands_and_nick():
-            for korniszon_text in korniszon_command.find_commands_and_nick():
-                korniszon(driver, korniszon_text, leaderboard)
+        # checks if any commands are found
+        binguj_commads_data = binguj_command.get_commands_data()
 
-        elif ranking_command.find_commands_and_nick():
-            for ranking_text in ranking_command.find_commands_and_nick():
-                # leaderboard = Leaderboard()
+        if binguj_commads_data:
+            for data in binguj_commads_data: # prompt returns a list of tuples with prompt and nickname
+                binguj(driver, data["input"], tabs)  # Call Binguj function with the command as an argument
+        
+
+        bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
+
+        if bingus_gpt_command.get_commands_data():
+            for data in bingus_gpt_commands_data:
+                bingusGpt(driver, data["input"], tabs)
+        
+
+        korniszon_commands_data = korniszon_command.get_commands_data()
+
+        if korniszon_commands_data:
+            for data in korniszon_commands_data:
+                korniszon(driver, data["input"], leaderboard)
+
+
+        ranking_commands_data = ranking_command.get_commands_data()
+
+        if ranking_commands_data:
+            for data in ranking_commands_data:
                 leaderboard.load_leaderboard()
-                leaderboard.display_leaderboard(driver)
-            
-        
-        # elif makeZaczepka:
-        #     zaczepiacz(driver, zaczepkaPrompt)
+                leaderboard.display_leaderboard(driver)        
+
 
         #restart a bot
-        elif restart_command.find_commands_and_nick():
-            for restart_text in restart_command.find_commands_and_nick():
+        restart_commands_data = restart_command.get_commands_data()
+
+        if restart_commands_data:
+            for data in restart_commands_data:
                 waitFindInputAndSendKeys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
                 initBot(driver)
 
-        elif help_command.find_commands_and_nick():
-            for command_list in help_command.find_commands_and_nick():
-                Command.help(driver)
+
+        help_commands_data = help_command.get_commands_data()
+
+        if help_commands_data:
+            for data in help_commands_data:
+                Command.help()
                 clearChat(driver) # list of commands can trigger some commands
 
 
     except TimeoutException:
         print("Timeout occurred while executing function")
         driver.switch_to.window(driver.window_handles[0])
-        safe_text = prompt if isinstance(prompt, str) else str(binguj_command.find_commands_and_nick())
-        waitFindInputAndSendKeys(driver, 1, By.ID, "chat-text", f"Nie udało się wybingować {safe_text} ;(")
+        waitFindInputAndSendKeys(driver, 1, By.ID, "chat-text", "Coś sie nie udało ;(")
         continue
 
     except Exception as e:
