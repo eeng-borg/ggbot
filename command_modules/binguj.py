@@ -45,4 +45,5 @@ def binguj(driver, commandText):
         chatMsg = "Nie udało się wygenerować obrazu"
     else:
         chatMsg = imageSrc
+        
     waitFindInputAndSendKeys(driver, 1, By.ID, "chat-text", chatMsg)

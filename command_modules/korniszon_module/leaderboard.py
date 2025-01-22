@@ -75,3 +75,5 @@ class Leaderboard:
             else:
                 response = "Nic tu nie ma, zrób najpierw jakieś korniszony może :)"
                 waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
+        
+        clearChat(driver)

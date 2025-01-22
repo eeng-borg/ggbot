@@ -146,7 +146,7 @@ def send_results(driver, score, korniszon_text, position):
 
 #---------------
 # main def
-def korniszon(driver, korniszon_text):
+def korniszon(driver, korniszon_text, leaderboard):
 
     score = 0
 
@@ -156,10 +156,11 @@ def korniszon(driver, korniszon_text):
     # remove special chars, numbers etc, so it looks nice no matter how much user (fircyk) is trying to make it ugly ;>   
     korniszon_text = korniszon_cleanup(driver, korniszon_text)
 
-    leaderboard = Leaderboard()
+    # leaderboard = Leaderboard()
     leaderboard.load_leaderboard()
 
     # if duplicates
+    # print(f"Korniszon: {korniszon_text} in {leaderboard.leaderboard}")
     if korniszon_text in leaderboard.leaderboard:
 
         pozycja = leaderboard.get_position(korniszon_text)
