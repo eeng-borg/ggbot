@@ -19,25 +19,26 @@ def check_symbol(symbol):
     else:
         return "Other"
     
-def korniszon_cleanup(driver, korniszon_text):
+def korniszon_cleanup(korniszon_input):
 
-    korniszon_text = korniszon_text.lower() # make words lowercase so they look better
-    korniszon_text = korniszon_text.rstrip() # remove spaces after string, so there are no doubles counted as diffrent word with spaces at the end
-    korniszon_text = ''.join([char for char in korniszon_text if char.isalpha() or char == " "]) # clear the word from anything else than letters and spaces
+    korniszon_input = korniszon_input.lower() # make words lowercase so they look better
+    korniszon_input = korniszon_input.rstrip() # remove spaces after string, so there are no doubles counted as diffrent word with spaces at the end
+    korniszon_input = ''.join([char for char in korniszon_input if char.isalpha() or char == " "]) # clear the word from anything else than letters and spaces
     
  
-    return korniszon_text
+    return korniszon_input
     
     
-def score_characters_value(score, korniszon_text):
-    for char in korniszon_text:
+def score_characters_value(score, korniszon_input):
+    for char in korniszon_input:
 
-        if check_symbol(char) == 'Letter' or 'Vowel' or "Space":
+        if check_symbol(char) in ['Letter', 'Vowel', 'Space']:
+
             rand = random.randint(9, 15)
             char_score = ord(char) % rand
             score += char_score * 2
     
-    score = score / len(korniszon_text)
+    score = score / len(korniszon_input)
 
     score /= 2.413 # tuning
     score *= random.uniform(1, 1.06) # grain of randomness
@@ -46,18 +47,18 @@ def score_characters_value(score, korniszon_text):
     return round(score, 2)
 
 
-def score_vowels_percent(score, korniszon_text):
+def score_vowels_percent(score, korniszon_input):
 
     vowels_count = 0
     vowels_percent = 0
 
 
-    for char in korniszon_text:
+    for char in korniszon_input:
         if check_symbol(char) == 'Vowel':
             vowels_count += 1
 
-    vowels_percent = vowels_count / len(korniszon_text) * 100
-    print(f"{vowels_percent} = {vowels_count} / {len(korniszon_text)} * 100 ")
+    vowels_percent = vowels_count / len(korniszon_input) * 100
+    print(f"{vowels_percent} = {vowels_count} / {len(korniszon_input)} * 100 ")
 
     if vowels_percent <= 50 and vowels_percent >= 20:
         score *= 2
@@ -73,20 +74,20 @@ def score_vowels_percent(score, korniszon_text):
     return round(score, 2)
 
 
-def score_repetitions(score, korniszon_text):
+def score_repetitions(score, korniszon_input):
 
     chars_reps = []
 
-    for char in korniszon_text:
+    for char in korniszon_input:
 
         if char not in chars_reps:
             chars_reps.append(char)
 
             if check_symbol(char) != 'Vowel':
 
-                if korniszon_text.count(char) > 2: # do it only if there are alot of repetitions
+                if korniszon_input.count(char) > 2: # do it only if there are alot of repetitions
 
-                    repetitions = korniszon_text.count(char) / 2
+                    repetitions = korniszon_input.count(char) / 2
                     score /= repetitions
 
                     print(f"{char}: {score} / {repetitions}")
@@ -94,9 +95,9 @@ def score_repetitions(score, korniszon_text):
     return round(score, 2)
 
 
-def score_lenght(score, korniszon_text):
+def score_lenght(score, korniszon_input):
     
-    lenght = len(korniszon_text)
+    lenght = len(korniszon_input)
     rand = random.randint(5, 10)
     golden_lenght = rand # the best number of letters for a korniszon
     diffrence = abs(golden_lenght - lenght)
@@ -109,7 +110,7 @@ def score_lenght(score, korniszon_text):
     return round(score, 2)
 
 
-def send_results(driver, score, korniszon_text, position):
+def send_results(driver, score, korniszon_input, position):
     emotka = ""
 
     if score > 500:
@@ -137,90 +138,81 @@ def send_results(driver, score, korniszon_text, position):
     elif score == 0:
         emotka = "..... <idiota>"            
 
-    response = (f"{korniszon_text} zdobył {score} punktów{emotka}\n"
+    response = (f"{korniszon_input} zdobył {score} punktów{emotka}\n"
     f"Zajął {position} miejsce.")
     waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
-    
-
 
 
 #---------------
 # main def
-def korniszon(driver, korniszon_text, leaderboard):
+def korniszon(driver, korniszon_data, leaderboard):
 
     score = 0
 
+    # remove special chars, numbers etc, so it looks nice no matter how much user (fircyk) is trying to make it ugly ;>   
+    # do it on korniszon_data, because we later pass it to the new_korniszon function
+    korniszon_data["input"] = korniszon_cleanup(korniszon_data["input"])
+
+    korniszon_input = korniszon_data["input"]
+
     # so it doesn't take the same word again
     clearChat(driver)
-
-    # remove special chars, numbers etc, so it looks nice no matter how much user (fircyk) is trying to make it ugly ;>   
-    korniszon_text = korniszon_cleanup(driver, korniszon_text)
 
     # leaderboard = Leaderboard()
     leaderboard.load_leaderboard()
 
     # if duplicates
-    # print(f"Korniszon: {korniszon_text} in {leaderboard.leaderboard}")
-    if korniszon_text in leaderboard.leaderboard:
+    # print(f"Korniszon: {korniszon_input} in {leaderboard.leaderboard}")
+    if any(korniszon_input == entry["input"] for entry in leaderboard.leaderboard):
 
-        pozycja = leaderboard.get_position(korniszon_text)
-        response = f"{korniszon_text} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
+        pozycja = leaderboard.get_position(korniszon_input)
+        response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
         return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
     
-
+    # edge cases
     # in case there were no letters in korniszon and you were left with empty variable
-    if len(korniszon_text) == 0:
+    if len(korniszon_input) == 0:
 
         response = f"{random.randint(-784545, -3456)} punktów <zniesmaczony>. Naum się w korniszony!"
         return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
     
-    elif len(korniszon_text) > 30:
+
+    elif len(korniszon_input) > 30:
+
         response = "Nie będę oceniał takiego długasa <nono>"
-        return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
-    
+        return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)    
     
 
     # check each character unicode number and then modulo them to get some random numbers, I want to make it hard to predict
-    score = score_characters_value(score, korniszon_text)
+    score = score_characters_value(score, korniszon_input)
     print(f"Char score: {round(score, 2)}")
     print('---')
 
     # check how many % of the string are vowels and then multiple the score - accoring to set rules. 
     # I don't want korniszons to have too many or too less vowels so they still sounds like words, ~30% is an golden rule.
-    score = score_vowels_percent(score, korniszon_text)
+    score = score_vowels_percent(score, korniszon_input)
     print(f"Vowels score: {round(score, 2)}")
     print('---')
 
     #score repetitions
     # check every character in a string ONCE, for how many repetitions it has and then divide the score by it
     # i don't want too many the same letters in one word to avoid fgddfdgfgfff  
-    score = score_repetitions(score, korniszon_text)
+    score = score_repetitions(score, korniszon_input)
     print(f"Reps score: {round(score, 2)}")
     print('---')
 
     # to avoid too short or too long words, the bigger diffrence from the ideal lenght the worse score
-    score = score_lenght(score, korniszon_text)
+    score = score_lenght(score, korniszon_input)
     print(f"Len score: {round(score, 2)}")
     print('---')
 
 
     # add new position to leaderboard, do it after calculating score
-    leaderboard.new_korniszon(korniszon_text, score)
+    leaderboard.add_korniszon(korniszon_data, score)
 
     # send the message on gg how much point your korniszon earned and what position it has on leaderbord
-    position = leaderboard.get_position(korniszon_text)
+    position = leaderboard.get_position(korniszon_input)
 
-    send_results(driver, score, korniszon_text, position)
+    send_results(driver, score, korniszon_input, position)
     print(f"Full score: {round(score, 2)}")
-
-            
-
-
-
-
-
-
-
-
-
 

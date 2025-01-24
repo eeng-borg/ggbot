@@ -7,8 +7,7 @@ class Command:
 
     # List of all commands and their descriptions, to use in help command
     command_type_list = []
-    driver = None
-    
+    driver = None    
 
     def __init__(self, driver, command_name, description, is_text_after_command : bool):
 
@@ -64,7 +63,7 @@ class Command:
 
             for message in reversed(incoming_messages):
 
-                print(f"Znaleziono: {len(incoming_messages)} wiadomości")
+                # print(f"Znaleziono: {len(incoming_messages)} wiadomości")
                 # xpath to find specific commands in the chat
                 xpath = self.__commandXpath()
                 raw_command_elements = message.find_elements(By.XPATH, f".{xpath}")  # Wait until the command is found and make a list of them
@@ -110,8 +109,7 @@ class Command:
                         print(command_data)
 
                         # Reset the command-found flag for the next iteration
-                        is_command_found = False
-                
+                        is_command_found = False                
                 
 
         # it should return a list of dictionaries containing all information about the command - input, nickname, date    

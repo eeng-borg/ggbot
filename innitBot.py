@@ -25,7 +25,7 @@ def initBot(driver):
     chatKomfa = 'Komfa'
     chatIng = 'Ing' # test chat
 
-    waitFindAndClick(driver, 1, By.XPATH, f"//*[text()='{chatIng}']") # click on profile and start chat, avoid stale element exception
+    waitFindAndClick(driver, 1, By.XPATH, f"//*[text()='{chatKomfa}']") # click on profile and start chat, avoid stale element exception
     waitFindAndClick(driver, 1, By.CLASS_NAME, "talk-button")  # click on talk button to start chat
     clearChat(driver) # too many messages can couse problems
 

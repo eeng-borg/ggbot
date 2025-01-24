@@ -50,6 +50,7 @@ help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro ju
 
 leaderboard = Leaderboard()
 
+
 # main loop for bot operations
 while(True):
     # try to catch exceptions if command is found
@@ -74,7 +75,7 @@ while(True):
 
         if korniszon_commands_data:
             for data in korniszon_commands_data:
-                korniszon(driver, data["input"], leaderboard)
+                korniszon(driver, data, leaderboard)
 
 
         ranking_commands_data = ranking_command.get_commands_data()
@@ -82,7 +83,7 @@ while(True):
         if ranking_commands_data:
             for data in ranking_commands_data:
                 leaderboard.load_leaderboard()
-                leaderboard.display_leaderboard(driver)        
+                leaderboard.display_leaderboard(driver)
 
 
         #restart a bot
@@ -113,4 +114,3 @@ while(True):
         driver.switch_to.window(driver.window_handles[0])
         continue
 
-    # input("Press Enter to exit...")
