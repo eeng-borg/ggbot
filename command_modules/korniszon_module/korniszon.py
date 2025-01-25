@@ -1,4 +1,4 @@
-from utils.utilities import waitFindInputAndSendKeys, waitFindAndReturn, waitFindAndClick, clearChat, filterBmp
+from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
 from selenium.webdriver.common.by import By
 from command_modules.korniszon_module.leaderboard import Leaderboard
 import random
@@ -76,14 +76,16 @@ def score_vowels_percent(score, korniszon_input):
     # then how much to subtract from the best mutliplier (which is *2)
     # we want around 30% of vowels in the word, which subtracts 0
     # the closer to 0% or 100%, the worse the subtraction. Up to 2.
-    # That's why we are dividing the diffrence by 16.5 or 33.5 to get the subtraction in the range of 0-2, from the best to the worst
+    # That's why we are dividing the diffrence by 16.5 or 33.5 (for target 33) to get the subtraction in the range of 0-2, from the best to the worst
 
+    # we are looking for a number which, if you divide diffrence by it, will give you a number from 0 to 2
     divide_positive = target_vowels_percent / 2 # 16.5 if target is 33 etc
-    divide_negative = (target_vowels_percent - 100) / 3 # 33.5 if target is 33 etc
+    divide_negative = (target_vowels_percent - 100) / 2 # 33.5 if target is 33 etc
 
+    multiplier_subtract = 0
     # up to 33
     if diffrence > 0:
-        multiplier_subtract = abs(diffrence / divide_positive) 
+        multiplier_subtract = abs(diffrence / divide_positive)
 
     # down to -67
     elif diffrence < 0:
@@ -98,7 +100,6 @@ def score_vowels_percent(score, korniszon_input):
     # and finally apply the multiplier to the score
     print(f"Score before: {score}")
     score *= vowels_multiplier
-
 
     return round(score, 2)
 
@@ -169,7 +170,7 @@ def send_results(driver, score, korniszon_input, position):
 
     response = (f"{korniszon_input} zdobył {score} punktów{emotka}\n"
     f"Zajął {position} miejsce.")
-    waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
+    wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)
 
 
 #---------------
@@ -185,7 +186,7 @@ def korniszon(driver, korniszon_data, leaderboard):
     korniszon_input = korniszon_data["input"]
 
     # so it doesn't take the same word again
-    clearChat(driver)
+    clear_chat(driver)
 
     # leaderboard = Leaderboard()
     leaderboard.load_leaderboard()
@@ -196,20 +197,20 @@ def korniszon(driver, korniszon_data, leaderboard):
 
         pozycja = leaderboard.get_position(korniszon_input)
         response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
-        return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
+        return wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)
     
     # edge cases
     # in case there were no letters in korniszon and you were left with empty variable
     if len(korniszon_input) == 0:
 
         response = f"{random.randint(-784545, -3456)} punktów <zniesmaczony>. Naum się w korniszony!"
-        return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)
+        return wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)
     
 
     elif len(korniszon_input) > 30:
 
         response = "Nie będę oceniał takiego długasa <nono>"
-        return waitFindInputAndSendKeys(driver, 10, By.ID, "chat-text", response)    
+        return wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)    
     
 
     # check each character unicode number and then modulo them to get some random numbers, I want to make it hard to predict

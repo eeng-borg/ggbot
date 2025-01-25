@@ -5,7 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 ##functions
 # find element by type and wait until it is clickable
-def waitFindAndClick(context, waitTime, by, elementName):
+def wait_find_and_click(context, waitTime, by, elementName):
     # for attempt in range(3):  # Retry up to 3 times
     #     try:
             # Wait until the element is clickable
@@ -24,7 +24,7 @@ def waitFindAndClick(context, waitTime, by, elementName):
         
 
 # wait until input bar has loaded, look for it and send text with ENTER
-def waitFindInputAndSendKeys(context, waitTime, by, elementName, inputText):
+def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText):
     # for attempt in range(3):  # Retry up to 3 times
     #     try:
             # Wait for the element to be present
@@ -47,17 +47,17 @@ def waitFindInputAndSendKeys(context, waitTime, by, elementName, inputText):
 
 
 # find element by type and return it
-def waitFindAndReturn(context, waitTime, by, elementName):
+def wait_find_and_return(context, waitTime, by, elementName):
     WebDriverWait(context, waitTime + 10).until(
         EC.presence_of_element_located((by, elementName))
     )
     element = context.find_element(by, elementName)
     return element
 
-def filterBmp(text):
+def filter_bmp(text):
     return ''.join(c for c in text if ord(c) <= 0xFFFF)
 
-def clearChat(driver):
-    toolbar = waitFindAndReturn(driver, 1, By.CLASS_NAME, "toolbar-right") # find chat toolbar
-    waitFindAndClick(toolbar, 1, By.CLASS_NAME, "settings-btn") # click on settings button
-    waitFindAndClick(driver, 1, By.CLASS_NAME, "clear-all") # click on clear all messages
+def clear_chat(driver):
+    toolbar = wait_find_and_return(driver, 1, By.CLASS_NAME, "toolbar-right") # find chat toolbar
+    wait_find_and_click(toolbar, 1, By.CLASS_NAME, "settings-btn") # click on settings button
+    wait_find_and_click(driver, 1, By.CLASS_NAME, "clear-all") # click on clear all messages

@@ -5,11 +5,11 @@ from selenium.webdriver.common.by import By
 import sys
 import os
 from selenium.common.exceptions import TimeoutException
-from utils.utilities import waitFindInputAndSendKeys, waitFindAndReturn, waitFindAndClick, clearChat, filterBmp
-from innitBot import initBot
+from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
+from innit_bot import init_bot
 
 from command_modules.binguj import binguj
-from command_modules.bingusGpt import bingusGpt
+from command_modules.bingus_gpt import bingus_gpt
 from command_modules.korniszon_module.korniszon import korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from command import Command
@@ -19,10 +19,9 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 # setup chrome profile, so it doesn't ask for logins
 chrome_options = Options()
-userPath = os.getenv('USER_PATH')
-chrome_options.add_argument(f"user-data-dir={userPath}/AppData/Local/Google/Chrome/User Data")  # Path to your profile
+user_path = os.getenv('USER_PATH')
+chrome_options.add_argument(f"user-data-dir={user_path}/AppData/Local/Google/Chrome/User Data")  # Path to your profile
 chrome_options.add_argument("--profile-directory=Default")  # Default profile directory
-
 
 # setup chrome driver
 try:
@@ -33,11 +32,10 @@ except Exception as e:
     exit(1)
 
 # initialize bot and return tabs
-tabs = initBot(driver)
-
+tabs = init_bot(driver)
 
 # for testing purposes automatically send command
-# WaitFindInputAndSendKeys(driver, 5, By.ID, "chat-text", "/binguj gf fdfd")
+# wait_find_input_and_send_keys(driver, 5, By.ID, "chat-text", "/binguj gf fdfd")
 # time.sleep(1) # wait for the command to be sent
 
 # initialize commands
@@ -45,6 +43,7 @@ binguj_command = Command(driver, 'binguj', "wpisz prompty na obrazek jaki chcesz
 bingus_gpt_command = Command(driver, 'bingus', "zapytaj się bingusa o cokolwiek, może pomoże ;>", True)
 korniszon_command = Command(driver, 'korniszon', "pokaż swojego korniszona, ocenimy uczciwie ;))", True)
 ranking_command = Command(driver, 'ranking', "ranking dwudziestu najpotężniejszych korniszonów w kosmosie!!", False)
+user_korniszon_stats_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>", True)
 restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś", False)
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]", False)
 
@@ -68,7 +67,7 @@ while(True):
 
         if bingus_gpt_command.get_commands_data():
             for data in bingus_gpt_commands_data:
-                bingusGpt(driver, data["input"], tabs)
+                bingus_gpt(driver, data["input"], tabs)
         
 
         korniszon_commands_data = korniszon_command.get_commands_data()
@@ -86,13 +85,22 @@ while(True):
                 leaderboard.display_leaderboard(driver)
 
 
+        # user_korniszon_stats_command
+        user_stats_data = user_korniszon_stats_command.get_commands_data()
+
+        if user_stats_data:
+            for data in user_stats_data:
+                leaderboard.load_leaderboard()
+                leaderboard.display_user_stats(driver, data["input"])
+                
+
         #restart a bot
         restart_commands_data = restart_command.get_commands_data()
 
         if restart_commands_data:
             for data in restart_commands_data:
-                waitFindInputAndSendKeys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
-                initBot(driver)
+                wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
+                init_bot(driver)
 
 
         help_commands_data = help_command.get_commands_data()
@@ -100,17 +108,16 @@ while(True):
         if help_commands_data:
             for data in help_commands_data:
                 Command.help()
-                clearChat(driver) # list of commands can trigger some commands
+                clear_chat(driver) # list of commands can trigger some commands
 
 
     except TimeoutException:
         print("Timeout occurred while executing function")
-        driver.switch_to.window(driver.window_handles[0])
-        waitFindInputAndSendKeys(driver, 1, By.ID, "chat-text", "Coś sie nie udało ;(")
-        continue
+        driver.switch_to.window(tabs["main tab"])
+        wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Coś sie nie udało ;(")
+        continue    
 
     except Exception as e:
         print(f"Unexpected error: {type(e).__name__}, {e}")
-        driver.switch_to.window(driver.window_handles[0])
+        driver.switch_to.window(tabs["main tab"])
         continue
-
