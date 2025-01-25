@@ -789,6 +789,18 @@
         "score": 466.4
     },
     {
+        "user": "Ing",
+        "input": "zorniszon",
+        "time": {
+            "hour": 19,
+            "minute": 32,
+            "day": 24,
+            "month": 1,
+            "year": 2025
+        },
+        "score": 466.08
+    },
+    {
         "user": null,
         "input": "ungwik",
         "time": {
@@ -6006,6 +6018,18 @@
         "score": 198.04
     },
     {
+        "user": "Ing",
+        "input": "cdo",
+        "time": {
+            "hour": 19,
+            "minute": 26,
+            "day": 24,
+            "month": 1,
+            "year": 2025
+        },
+        "score": 197.92
+    },
+    {
         "user": null,
         "input": "benzo suka",
         "time": {
@@ -8438,6 +8462,18 @@
         "score": 148.35
     },
     {
+        "user": "Ing",
+        "input": "bobobo",
+        "time": {
+            "hour": 19,
+            "minute": 1,
+            "day": 24,
+            "month": 1,
+            "year": 2025
+        },
+        "score": 148.28
+    },
+    {
         "user": null,
         "input": "pabi",
         "time": {
@@ -8462,6 +8498,18 @@
             "second": null
         },
         "score": 148.05
+    },
+    {
+        "user": "Ing",
+        "input": "cocc",
+        "time": {
+            "hour": 19,
+            "minute": 17,
+            "day": 24,
+            "month": 1,
+            "year": 2025
+        },
+        "score": 147.8
     },
     {
         "user": null,
@@ -13188,6 +13236,18 @@
         "score": 97.16
     },
     {
+        "user": "Ing",
+        "input": "ado",
+        "time": {
+            "hour": 19,
+            "minute": 28,
+            "day": 24,
+            "month": 1,
+            "year": 2025
+        },
+        "score": 97.16
+    },
+    {
         "user": null,
         "input": "kernel",
         "time": {
@@ -14133,6 +14193,18 @@
             "second": null
         },
         "score": 88.8
+    },
+    {
+        "user": "Ing",
+        "input": "rddo",
+        "time": {
+            "hour": 19,
+            "minute": 29,
+            "day": 24,
+            "month": 1,
+            "year": 2025
+        },
+        "score": 88.74
     },
     {
         "user": null,
@@ -16001,6 +16073,18 @@
         "score": 70.34
     },
     {
+        "user": "Ing",
+        "input": "bobb",
+        "time": {
+            "hour": 19,
+            "minute": 9,
+            "day": 24,
+            "month": 1,
+            "year": 2025
+        },
+        "score": 70.14
+    },
+    {
         "user": null,
         "input": "bladeeee",
         "time": {
@@ -16806,6 +16890,18 @@
         "score": 62.58
     },
     {
+        "user": "Ing",
+        "input": "bobo",
+        "time": {
+            "hour": 19,
+            "minute": 0,
+            "day": 24,
+            "month": 1,
+            "year": 2025
+        },
+        "score": 62.37
+    },
+    {
         "user": null,
         "input": "the",
         "time": {
@@ -17477,18 +17573,6 @@
             "second": null
         },
         "score": 54.42
-    },
-    {
-        "user": "Ing",
-        "input": "olaboo",
-        "time": {
-            "hour": 19,
-            "minute": 11,
-            "day": 23,
-            "month": 1,
-            "year": 2025
-        },
-        "score": 54.16
     },
     {
         "user": null,
@@ -19871,30 +19955,6 @@
             "hour": null,
             "minute": null,
             "second": null
-        },
-        "score": 0.0
-    },
-    {
-        "user": "Ing",
-        "input": "ffd",
-        "time": {
-            "hour": 19,
-            "minute": 33,
-            "day": 23,
-            "month": 1,
-            "year": 2025
-        },
-        "score": 0.0
-    },
-    {
-        "user": "Ing",
-        "input": "gfgf",
-        "time": {
-            "hour": 19,
-            "minute": 41,
-            "day": 23,
-            "month": 1,
-            "year": 2025
         },
         "score": 0.0
     }

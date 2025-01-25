@@ -2,6 +2,9 @@ from utils.utilities import waitFindInputAndSendKeys, waitFindAndReturn, waitFin
 from selenium.webdriver.common.by import By
 from command_modules.korniszon_module.leaderboard import Leaderboard
 import random
+import logging as Log
+
+# Log.basicConfig(level=Log.INFO)
 
 def check_symbol(symbol):
     vowels = "aeiouyąęóAEIOUYĄĘÓ"
@@ -49,27 +52,53 @@ def score_characters_value(score, korniszon_input):
 
 def score_vowels_percent(score, korniszon_input):
 
+    target_vowels_percent = 33
+
     vowels_count = 0
     vowels_percent = 0
-
+    word_lenght = len(korniszon_input.replace(" ", "")) # so it doesn't count spaces
 
     for char in korniszon_input:
         if check_symbol(char) == 'Vowel':
             vowels_count += 1
 
-    vowels_percent = vowels_count / len(korniszon_input) * 100
-    print(f"{vowels_percent} = {vowels_count} / {len(korniszon_input)} * 100 ")
+    # calculate the percentage of vowels in the input word
+    vowels_percent = vowels_count / word_lenght * 100
+        # print(f"Vowels percent: {vowels_percent} = {vowels_count} / {word_lenght} * 100 ")
 
-    if vowels_percent <= 50 and vowels_percent >= 20:
-        score *= 2
+    # remove all decimals to make it more predictable for testing etc
+    vowels_percent = int(vowels_percent)
 
-    elif vowels_percent <= 75 and vowels_percent >= 10:
-        score *= 1
-        
-    else:
-        score *= 0
-    
-    print(f"Vowels: {vowels_percent}%")
+    # calculate the diffrence between the desired percentage and the actual percentage 
+    diffrence = target_vowels_percent - vowels_percent
+        # print(f"Diffrence: {diffrence} = {target_vowels_percent} - {vowels_percent}")
+
+    # then how much to subtract from the best mutliplier (which is *2)
+    # we want around 30% of vowels in the word, which subtracts 0
+    # the closer to 0% or 100%, the worse the subtraction. Up to 2.
+    # That's why we are dividing the diffrence by 16.5 or 33.5 to get the subtraction in the range of 0-2, from the best to the worst
+
+    divide_positive = target_vowels_percent / 2 # 16.5 if target is 33 etc
+    divide_negative = (target_vowels_percent - 100) / 3 # 33.5 if target is 33 etc
+
+    # up to 33
+    if diffrence > 0:
+        multiplier_subtract = abs(diffrence / divide_positive) 
+
+    # down to -67
+    elif diffrence < 0:
+        multiplier_subtract = abs(diffrence / divide_negative)
+
+
+    # now i'm subtracting the best multiplier (2) by above result
+    base_multiplier = 2
+    vowels_multiplier = base_multiplier - round(multiplier_subtract, 2)
+        # print(f"Multiplier: {vowels_multiplier} = {base_multiplier} - {diffrence}")
+
+    # and finally apply the multiplier to the score
+    print(f"Score before: {score}")
+    score *= vowels_multiplier
+
 
     return round(score, 2)
 
@@ -136,7 +165,7 @@ def send_results(driver, score, korniszon_input, position):
     elif score == 00.10:
         emotka = "... <leje>"
     elif score == 0:
-        emotka = "..... <idiota>"            
+        emotka = "..... <idiota>"
 
     response = (f"{korniszon_input} zdobył {score} punktów{emotka}\n"
     f"Zajął {position} miejsce.")

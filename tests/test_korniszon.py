@@ -18,20 +18,25 @@ class SharedData:
 
 class TestVowelsPercent:
 
-    # below 10 or above 75%
-    @pytest.mark.parametrize("text", ["oooo", "oaauuiióeęą", "kkkkk", "dfdffdfdf"])
-    def test_bad_score(self, text):
+    @pytest.mark.parametrize("text", ["oooo", "oaauuiióeęą", "aie ou y"])
+    def test_100_percent(self, text):
         assert score_vowels_percent(SharedData.base_score, text) == 0
 
-    #10-19% or 51-75%
-    @pytest.mark.parametrize("text", ["booboo", "bbbbbo"])
-    def test_mid_score(self, text):
-        assert score_vowels_percent(SharedData.base_score, text) == 10
+    @pytest.mark.parametrize("text", ["hobo", "dó da"])
+    def test_50_percent(self, text):
+        assert score_vowels_percent(SharedData.base_score, text) == 14.9
 
-    #20-50%
-    @pytest.mark.parametrize("text", ["korniszon", "bob", "bobb", "bobo", "bobbo"])
-    def test_good_score(self, text):
+    @pytest.mark.parametrize("text", ["korniszon", "bo b"])
+    def test_33_percent(self, text):
         assert score_vowels_percent(SharedData.base_score, text) == 20
+
+    @pytest.mark.parametrize("text", ["bobb", "ccoocccc"])
+    def test_25_percent(self, text):
+        assert score_vowels_percent(SharedData.base_score, text) == 15.2
+
+    @pytest.mark.parametrize("text", ["kkkkkkk", "ccfdfsffdfgfcccc","dfdf dfdf"])
+    def test_0_percent(self, text):
+        assert score_vowels_percent(SharedData.base_score, text) == 0
 
 class TestScoreRepetitions:
     
