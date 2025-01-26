@@ -1,47 +1,20 @@
-from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
+from selenium import webdriver
+from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, clear_chat, filter_bmp
+from utils.types import CommandData
+from typing import List
 from selenium.webdriver.common.by import By
 import time
 
-# def getAnswerAndSendItOnChat(driver, prompt):
 
-#         # switch to chatgpt tab, so we can send the prompt and generate the response
-#         driver.switch_to.window(driver.window_handles[1])
-
-#         # send prompt to chatGPT to genearate the response
-#         xpathSend = '//*[@id="prompt-textarea"]'
-#         wait_find_input_and_send_keys(driver, 1, By.XPATH, xpathSend, prompt)
-
-#         #wait for the response to be generated
-#         time.sleep(1)
-#         xpath = '//*[@data-testid="composer-speech-button"]' # when the response is done, speech button should appear in place of 'stop generate' button
-#         wait_find_and_return(driver, 30, By.XPATH, xpath) # wait for the button to appear, so we know the response is ready and we can proceed
-#         time.sleep(1) # sometimes this button shows up for a split second (or too soon) and then disappears, so we need to wait a little bit longer
-
-#         # look for the last message on chatgpt, which has true data-scroll-anchor attribute
-#         xpath = '//*[@data-scroll-anchor="true"]'
-#         element = wait_find_and_return(driver, 1, By.XPATH, xpath)
-#         # print(f"Element found: {element.get_attribute('outerHTML')}")
-
-#         xpath2 = ".//div[contains(@class, 'markdown') and contains(@class, 'prose')]"
-#         # Use relative XPath starting from the parent element
-#         response = wait_find_and_return(element, 1, By.XPATH, xpath2)
-#         # print(f"Response found: {response.get_attribute('outerHTML')}")
-#         print(f"Response found: {response.text}")
-        
-#         text = response.text
-
-#         # switch back to chat tab and send the image
-#         driver.switch_to.window(driver.window_handles[0]) # switch back to chat tab
-#         text = filter_bmp(text)
-#         wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", text)
-
-def generate_answer(driver, prompt, tabs):
+def generate_answer(driver: webdriver.Chrome, data: CommandData, tabs):
         # switch to chatgpt tab, so we can send the prompt and generate the response
         driver.switch_to.window(tabs["gpt tab"])
 
+        question = f"(Nazywam się {data['user']}) {data['input']}" # add nickname to the prompt
+
         # send prompt to chatGPT to genearate the response
         xpathSend = '//*[@id="prompt-textarea"]'
-        wait_find_input_and_send_keys(driver, 1, By.XPATH, xpathSend, prompt)
+        wait_find_input_and_send_keys(driver, 1, By.XPATH, xpathSend, question)
 
         #wait for the response to be generated
         time.sleep(1)
@@ -50,7 +23,7 @@ def generate_answer(driver, prompt, tabs):
         time.sleep(1) # sometimes this button shows up for a split second (or too soon) and then disappears, so we need to wait a little bit longer
 
 
-def get_answer(driver):
+def get_answer(driver: webdriver.Chrome):
         # look for the last message on chatgpt, which has true data-scroll-anchor attribute
         xpath = '//*[@data-scroll-anchor="true"]'
         element = wait_find_and_return(driver, 1, By.XPATH, xpath)
@@ -65,7 +38,7 @@ def get_answer(driver):
         return response.text
 
 
-def send_answer(driver, answer, tabs):
+def send_answer(driver: webdriver.Chrome, answer, tabs):
         # switch back to chat tab and send the image
         driver.switch_to.window(tabs["main tab"]) # switch back to chat tab
         answer = filter_bmp(answer)
@@ -74,7 +47,7 @@ def send_answer(driver, answer, tabs):
 
 #-------------------------------------------------------------
 # MAIN MODULE FUNCTION
-def bingus_gpt(driver, prompt, tabs):
+def bingus_gpt(driver: webdriver.Chrome, data: CommandData, tabs):
 
         time.sleep(1) # wait for the command to be sent, idk why but it won't work without it
         wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "<myśli>") # send message that text is being generated
@@ -90,10 +63,8 @@ def bingus_gpt(driver, prompt, tabs):
         nowoPolski = "(Rób błędy gramatyczne, np. błendy zamiast błędy, kuamstwa zamiast kłamstwa, gurom zamiast górom)"
         emotki = "(używasz emotek takich jak - <faja>, <palacz>, :>, ;>, :)), <bije>, <biją>, <myśli>, <myśli2>, <hura>, <hejka>, <zniesmaczony>, <wnerw>, <nerwus>, <zawstydzony>, <onajego>, <peace>, <tańczę>, :((, ??, !!, ;(, <lol>, <telefon2>, <piwosz>, <dresik>, <leje>, <urwanie głowy>, <niedowiarek>, <śnieg>, <gra>) "
         
-        generate_answer(driver, prompt, tabs)
-
+        generate_answer(driver, data, tabs)
         answer = get_answer(driver)
-
         send_answer(driver, answer, tabs)
 
         

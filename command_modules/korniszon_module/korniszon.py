@@ -1,12 +1,15 @@
 from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
 from selenium.webdriver.common.by import By
-from command_modules.korniszon_module.leaderboard import Leaderboard
+from selenium import webdriver
 import random
 import logging as Log
+from utils.types import CommandData
+from command_modules.korniszon_module.leaderboard import Leaderboard
+from typing import List
 
 # Log.basicConfig(level=Log.INFO)
 
-def check_symbol(symbol):
+def check_symbol(symbol: str) -> str:
     vowels = "aeiouyąęóAEIOUYĄĘÓ"
 
     if symbol.isdigit():
@@ -22,7 +25,7 @@ def check_symbol(symbol):
     else:
         return "Other"
     
-def korniszon_cleanup(korniszon_input):
+def korniszon_cleanup(korniszon_input: str) -> str:
 
     korniszon_input = korniszon_input.lower() # make words lowercase so they look better
     korniszon_input = korniszon_input.rstrip() # remove spaces after string, so there are no doubles counted as diffrent word with spaces at the end
@@ -32,7 +35,7 @@ def korniszon_cleanup(korniszon_input):
     return korniszon_input
     
     
-def score_characters_value(score, korniszon_input):
+def score_characters_value(score: float, korniszon_input: str) -> float:
     for char in korniszon_input:
 
         if check_symbol(char) in ['Letter', 'Vowel', 'Space']:
@@ -50,7 +53,7 @@ def score_characters_value(score, korniszon_input):
     return round(score, 2)
 
 
-def score_vowels_percent(score, korniszon_input):
+def score_vowels_percent(score: float, korniszon_input: str) -> float:
 
     target_vowels_percent = 33
 
@@ -175,7 +178,7 @@ def send_results(driver, score, korniszon_input, position):
 
 #---------------
 # main def
-def korniszon(driver, korniszon_data, leaderboard):
+def korniszon(driver: webdriver.Chrome, korniszon_data: CommandData, leaderboard: Leaderboard):
 
     score = 0
 

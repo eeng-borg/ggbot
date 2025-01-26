@@ -1,15 +1,18 @@
 from selenium.webdriver.common.by import By
 from utils.utilities import filter_bmp, clear_chat, wait_find_input_and_send_keys
+from utils.types import CommandData
 from datetime import date
 from datetime import datetime
+from selenium import webdriver
+from typing import List
+
 
 class Command:
 
     # List of all commands and their descriptions, to use in help command
     command_type_list = []
-    driver = None    
 
-    def __init__(self, driver, command_name, description, is_text_after_command : bool):
+    def __init__(self, driver: webdriver.Chrome, command_name: str, description: str, is_text_after_command : bool):
 
         Command.driver = driver
         self.command_name = command_name
@@ -27,9 +30,9 @@ class Command:
         if(self.is_text_after_command == True):
 
             xpath = ( #image generation command
-            "//*[@class='ml__item-part-content' " # command is in the active chat
-            f"and starts-with(normalize-space(text()), '/{self.command_name} ') " # command starts with '/binguj '
-            f"and string-length(normalize-space(text())) > string-length('/{self.command_name} ')]" # command is not empty after '/binguj '
+            "//*[@class='ml__item-part-content' " # if command is in the active chat
+            f"and starts-with(normalize-space(text()), '/{self.command_name} ') " # if command starts with '/binguj '
+            f"and string-length(normalize-space(text())) > string-length('/{self.command_name} ')]" # if command is not empty after '/binguj '
             )
 
         # for commands like '/restart' which don't need additional input
@@ -43,7 +46,7 @@ class Command:
 
         return xpath
     
-
+    # WIP - not implemented
     # Find the nickname of the user who sent the command. If someone wrote multiple messages in a row, 
     # find their first message to get the element with the nickname.
     def get_command_elements(self):
@@ -64,68 +67,9 @@ class Command:
                         command_elements.append(message)
 
                 return command_elements
-        
-    ## new functions for getting command data, better test handling but doesn't feels right
-    # def get_commands_data(self, command_elements):
-
-    #     # check if the list is not empty, if is empty - ignore function
-    #     if command_elements:
-
-    #         received_commands = [] # list of all commands found in the chat before clearing it
-    #         command_data = {} # data of a single command
-
-    #         input = ""
-    #         user_nickname = ""
-    #         time = {}
-
-    #         for element in command_elements:
-
-    #             # Check if the user has sent a command and turn on a switch to look for the user's nickname
-
-    #             print(f"Message: {element.text}, remove: {self.command_name}")
-                
-    #             # use lstrip to remove command name and whitespaces from the start of the text
-    #             input = element.text.lstrip(f"/{self.command_name}")
-    #             input = input.strip()  # remove whitespaces from the start and end of the text
-    #             input = filter_bmp(input)  # Filter out unsupported characters from the text
-
-
-    #             nickname_elements = element.find_elements(By.CLASS_NAME, "ml__item-username")
-    #             print(f"Nick found: {len(nickname_elements)}")
-
-    #             if nickname_elements:
-    #                 print(f"Nick: {nickname_elements[0].text}")
-
-    #                 # Extract and clean the nickname
-    #                 user_nickname = nickname_elements[0].text
-    #                 user_nickname = user_nickname.replace(",", "") # theres a comma after a nickname ib ml__item-username text
-    #                 user_nickname = filter_bmp(user_nickname)
-
-
-    #                 # Add command info to the dictionary
-    #                 command_data["user"] = user_nickname
-    #                 command_data["command"] = self.command_name
-    #                 command_data["input"] = input
-
-    #                 time["hour"] = datetime.now().hour
-    #                 time["minute"] = datetime.now().minute
-    #                 time["day"] = datetime.now().day
-    #                 time["month"] = datetime.now().month
-    #                 time["year"] = datetime.now().year
-
-    #                 command_data["time"] = time
-
-    #                 received_commands.append(command_data)
-    #                 print(command_data)
-
-    #                 # Reset the command-found flag for the next iteration
-                
-
-    #     # it should return a list of dictionaries containing all information about the command - input, nickname, date    
-    #     return received_commands
     
 
-    def get_commands_data(self):
+    def get_commands_data(self) -> List[CommandData]:
 
         received_commands = [] # list of all commands found in the chat before clearing it
         command_data = {} # data of a single command

@@ -3,19 +3,22 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import sys
+import io
 import os
 from selenium.common.exceptions import TimeoutException
 from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
-from innit_bot import init_bot
+from innit_bot import innit_bot
 
 from command_modules.binguj import binguj
 from command_modules.bingus_gpt import bingus_gpt
 from command_modules.korniszon_module.korniszon import korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
-from command import Command
+from command_modules.command import Command
 
 # Set default encoding to UTF-8, to avoid UnicodeEncodeError
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 sys.stdout.reconfigure(encoding='utf-8')
+
 
 # setup chrome profile, so it doesn't ask for logins
 chrome_options = Options()
@@ -27,12 +30,13 @@ chrome_options.add_argument("--profile-directory=Default")  # Default profile di
 try:
     service = Service(executable_path='chromedriver.exe')
     driver = webdriver.Chrome(service=service, options=chrome_options)
+
 except Exception as e:
     print(f"Error initializing the Chrome driver: {e}")
     exit(1)
 
 # initialize bot and return tabs
-tabs = init_bot(driver)
+tabs = innit_bot(driver)
 
 # for testing purposes automatically send command
 # wait_find_input_and_send_keys(driver, 5, By.ID, "chat-text", "/binguj gf fdfd")
@@ -60,14 +64,14 @@ while(True):
 
         if binguj_commads_data:
             for data in binguj_commads_data: # prompt returns a list of tuples with prompt and nickname
-                binguj(driver, data["input"], tabs)  # Call Binguj function with the command as an argument
+                binguj(driver, str(data["input"]), tabs)  # Call Binguj function with the command as an argument
         
 
         bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
 
-        if bingus_gpt_command.get_commands_data():
+        if bingus_gpt_commands_data:
             for data in bingus_gpt_commands_data:
-                bingus_gpt(driver, data["input"], tabs)
+                bingus_gpt(driver, data, tabs)
         
 
         korniszon_commands_data = korniszon_command.get_commands_data()
@@ -81,8 +85,8 @@ while(True):
 
         if ranking_commands_data:
             for data in ranking_commands_data:
-                leaderboard.load_leaderboard()
-                leaderboard.display_leaderboard(driver)
+                leaderboard.load_leaderboard()                
+                leaderboard.display_leaderboard(driver, data["input"])
 
 
         # user_korniszon_stats_command
@@ -100,7 +104,7 @@ while(True):
         if restart_commands_data:
             for data in restart_commands_data:
                 wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
-                init_bot(driver)
+                innit_bot(driver)
 
 
         help_commands_data = help_command.get_commands_data()

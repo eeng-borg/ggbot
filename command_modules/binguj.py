@@ -1,8 +1,10 @@
+from selenium import webdriver
 from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
 from selenium.webdriver.common.by import By
 import time
+from typing import Dict
 
-def generate_image(driver, commandText, tabs):
+def generate_image(driver: webdriver.Chrome, commandText: str, tabs: Dict[str,str]):
     # switch to bing tab
     driver.switch_to.window(tabs["bing tab"]) # switch to bing tab    
 
@@ -12,7 +14,8 @@ def generate_image(driver, commandText, tabs):
     print("Image generated")
 
 
-def get_image_link(driver):
+def get_image_link(driver: webdriver.Chrome) -> str|None:
+
     # switch to iframe with generated image
     iframe = wait_find_and_return(driver, 1, By.XPATH, "//iframe[@id='OverlayIFrame']")
     driver.switch_to.frame(iframe)
@@ -32,11 +35,11 @@ def get_image_link(driver):
     wait_find_and_click(driver, 1, By.XPATH, "//*[(@data-tooltip='Zamknij obraz')]") # close image Iframe
     driver.switch_to.default_content() # Exit iframe and switch back to the main document
     
-    return image_link   
+    return image_link
 
 
 
-def send_image(driver, image_link, tabs):
+def send_image(driver: webdriver.Chrome, image_link: str|None, tabs: Dict[str,str]):
 
     driver.switch_to.window(tabs["main tab"]) # switch back to chat tab
     if image_link is None:
@@ -49,7 +52,7 @@ def send_image(driver, image_link, tabs):
 
 #-------------------------------------------------------------
 # MAIN MODULE FUNCTION
-def binguj(driver, commandText, tabs):
+def binguj(driver: webdriver.Chrome, commandText: str, tabs: Dict[str,str]):
 
     time.sleep(1) # wait for the command to be sent, idk why but it won't work without it
     # send message on chat that image is being generated
