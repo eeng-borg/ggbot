@@ -2,10 +2,10 @@ from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return,
 from utils.types import CommandData, KorniszonData
 import json
 import os
-import math
+import time
 from selenium.webdriver.common.by import By
 from selenium import webdriver
-import logging as log
+from typing import Dict
 
 
 # korniszon leaderboard
@@ -38,29 +38,31 @@ class Leaderboard:
 
         new_korniszon = {}
 
-        # add score to new_korniszon data and remove command type
+        # add score to new_korniszon data and remove command key
         for data_key, data_value in command_data.items():
             new_korniszon[data_key] = data_value
 
+        # every command here is /korniszon, so we don't need it 
         del new_korniszon['command']
-
-
         new_korniszon["score"] = score
-        del new_korniszon["command"]
 
         # add new result
-        self.leaderboard.append(new_korniszon)
-
+        self.leaderboard.append(new_korniszon)        
 
         # print(f"add new result:  {self.leaderboard}")
 
         # sort
         sorted_leaderboard = sorted(self.leaderboard, key=lambda x: x.get('score', 0), reverse=True) # print(sorted_leaderboard)
         
+        # add updated position
+        for index, korniszon in enumerate(sorted_leaderboard):
+            korniszon["position"] = index + 1
+
+
         # Save to a JSON file
         with open(self.leaderboard_file_name, 'w', encoding='utf-8') as f:
             # print(f"Zapisuje: {sorted_leaderboard}")
-            json.dump(sorted_leaderboard, f, indent=4 )
+            json.dump(sorted_leaderboard, f, indent=4)
 
         
         self.leaderboard = sorted_leaderboard
@@ -72,50 +74,89 @@ class Leaderboard:
         # new_korniszon returns leaderboard_sorted
 
         for item in self.leaderboard:
-            log.info(f"Item: {item}")
 
             if item.get("input") == korniszon_text:
                 position = self.leaderboard.index(item) + 1
                 print(f"position: {position}")
 
                 return position
-
         
     
     # def find_by_name(self, korniszon_text):
     #     self.leaderboard
 
+    def __get_range_from_input(self, data_input: str) -> Dict:
+        # remove everything except numbers and spaces
+        from_index = 0
+        to_index = 10
+
+        # remove everything exept for numbers and spaces, 
+        numbers = "".join([char for char in data_input if char.isdigit() or char.isspace()])
+        # then remove any spaces before or after, if there's a number and a word, then it will leave a space
+        # and then it will count it as an second input after a split
+        input_list = numbers.strip()
+        input_list = input_list.split(" ")
+
+
+        print(f"inputs: {input_list}")
+        print(f"input_list: {len(input_list)}")
+
+        try:
+            if len(input_list) >= 2:
+                from_index = int(input_list[0]) - 1
+                to_index = int(input_list[1]) - 1
+
+            elif len(input_list) == 1:
+                to_index = int(input_list[0])
+
+        except ValueError:
+            return {"from_index": from_index, "to_index": to_index}
+
+        return {"from_index": from_index, "to_index": to_index}
+    
+
     def display_leaderboard(self, driver: webdriver.Chrome, data_input: str):
 
-        # from_index = 0
-        # to_index = 10
-        # if data_input:
-        #     # remove everything except numbers and spaces
-        #     numbers = "".join([char for char in data_input if char.isdigit() or char.isspace()])
-        #     input_list = numbers.split(" ")
-        #     print(f"input_list: {len(input_list)}")
+        from_index = 0
+        to_index = 10
 
-        #     if len(input_list) == 2:
-        #         from_index = int(input_list[0])
-        #         to_index = int(input_list[1])
+        if len(data_input) > 0: # input always return string, empty string acts like none
+            # remove everything except numbers and spaces
+            range_dict = self.__get_range_from_input(data_input)
+            from_index = range_dict["from_index"]
+            to_index = range_dict["to_index"]
 
-        #     elif len(input_list) == 1:
-        #         to_index = int(input_list[0])
+        
+        # check if range not too big, to avoid spamming with 1k long ranking lists
+        # if it is - subtract the range by 50 and
+        max_range = 30
+        
+        index_range = to_index - from_index # 120 - 30 = 90
+        print(f"Kalkuluj: {index_range} = {to_index} - {from_index}")
 
-        # for index, korniszon in enumerate(self.leaderboard[from_index : to_index]):
-        for index, korniszon in enumerate(self.leaderboard[:10]):
+        if index_range > max_range:
+            to_index = to_index - (index_range - max_range) + 1
+            response = f"Hola komboju <luzik> {index_range} nie dostaniesz, masz 30."
+            wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
+            time.sleep(1)
+            print(f"to_index: {to_index}")
+
+        for korniszon in self.leaderboard[from_index : to_index]:
+        # for index, korniszon in enumerate(self.leaderboard[:10]):
 
             input = korniszon.get("input")
             score = korniszon.get("score")
             user = korniszon.get("user")
+            position = korniszon.get("position")
 
             if len(self.leaderboard) > 0:
 
-                response = f"{index + 1}. {input} - {score}"
+                response = f"{position}. {input} - {score}"
                 if user:
                     response += f" ({user})"
 
                 wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)
+
             else:
                 response = "Nic tu nie ma, zrób najpierw jakieś korniszony może :)"
                 wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)
@@ -126,7 +167,7 @@ class Leaderboard:
 
     # user stats
 
-    def __get_user_score_sum(self, user: str) -> float:
+    def __get_user_score_sum(self, user) -> float:
 
         score_sum = 0
 
@@ -138,7 +179,7 @@ class Leaderboard:
         return score_sum
     
     
-    def __get_user_average_score(self, user: str) -> float:
+    def __get_user_average_score(self, user) -> float:
 
         score_sum = self.__get_user_score_sum(user)
         score_average = 0
@@ -176,9 +217,16 @@ class Leaderboard:
 
 
     # user functions
-    def display_user_stats(self, driver: webdriver.Chrome, user: str):
+    def display_user_stats(self, driver: webdriver.Chrome, data: CommandData):
         
         clear_chat(driver)
+        user = ''
+
+        if data.get('input') == '':
+            user = data.get('user')
+        
+        else:
+            user = data.get('input')
 
         # check if user has any korniszon, if not then he don't have any stats to show
         # is_at_least_one = self.___get_user_korniszons(user, 1)

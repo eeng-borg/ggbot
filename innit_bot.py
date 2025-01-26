@@ -31,7 +31,7 @@ def innit_bot(driver: webdriver.Chrome) -> Dict[str,str]:
     chat_komfa = 'Komfa'
     chat_ing = 'Ing' # test chat
 
-    wait_find_and_click(driver, 1, By.XPATH, f"//*[text()='{chat_ing}']") # click on profile and start chat, avoid stale element exception
+    wait_find_and_click(driver, 1, By.XPATH, f"//*[text()='{chat_komfa}']") # click on profile and start chat, avoid stale element exception
     wait_find_and_click(driver, 1, By.CLASS_NAME, "talk-button")  # click on talk button to start chat
     clear_chat(driver) # too many messages can couse problems
 

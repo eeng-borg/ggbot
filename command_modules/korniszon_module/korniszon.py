@@ -2,7 +2,6 @@ from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return,
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 import random
-import logging as Log
 from utils.types import CommandData
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from typing import List

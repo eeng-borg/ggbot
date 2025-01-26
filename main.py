@@ -43,13 +43,13 @@ tabs = innit_bot(driver)
 # time.sleep(1) # wait for the command to be sent
 
 # initialize commands
-binguj_command = Command(driver, 'binguj', "wpisz prompty na obrazek jaki chcesz wygenerować :)", True)
-bingus_gpt_command = Command(driver, 'bingus', "zapytaj się bingusa o cokolwiek, może pomoże ;>", True)
-korniszon_command = Command(driver, 'korniszon', "pokaż swojego korniszona, ocenimy uczciwie ;))", True)
-ranking_command = Command(driver, 'ranking', "ranking dwudziestu najpotężniejszych korniszonów w kosmosie!!", False)
-user_korniszon_stats_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>", True)
-restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś", False)
-help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]", False)
+binguj_command = Command(driver, 'binguj', "wpisz prompty na obrazek jaki chcesz wygenerować :)")
+bingus_gpt_command = Command(driver, 'bingus', "zapytaj się bingusa o cokolwiek, może pomoże ;>")
+korniszon_command = Command(driver, 'korniszon', "pokaż swojego korniszona, ocenimy uczciwie ;))")
+ranking_command = Command(driver, 'ranking', "ranking dwudziestu najpotężniejszych korniszonów w kosmosie!!")
+user_korniszon_stats_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
+restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
+help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
 leaderboard = Leaderboard()
 
@@ -95,7 +95,7 @@ while(True):
         if user_stats_data:
             for data in user_stats_data:
                 leaderboard.load_leaderboard()
-                leaderboard.display_user_stats(driver, data["input"])
+                leaderboard.display_user_stats(driver, data)
                 
 
         #restart a bot
