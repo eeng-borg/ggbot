@@ -11,7 +11,7 @@ def set_gpt_charcter(driver: webdriver.Chrome, gpt_tab: str):
     wait_find_input_and_send_keys(driver, 1, By.XPATH, xpathSend, characterFaja)
 
 
-def innit_bot(driver: webdriver.Chrome) -> Dict[str,str]:
+def innit_bot(driver: webdriver.Chrome, target_chat) -> Dict[str,str]:
     
     # Close all tabs except the first one to perform a clean start
     main_tab = driver.window_handles[0]  # Store the first tab
@@ -28,10 +28,8 @@ def innit_bot(driver: webdriver.Chrome) -> Dict[str,str]:
     driver.get('https://www.gg.pl/#latest') # open webgg page
     driver.maximize_window()
 
-    chat_komfa = 'Komfa'
-    chat_ing = 'Ing' # test chat
 
-    wait_find_and_click(driver, 1, By.XPATH, f"//*[text()='{chat_komfa}']") # click on profile and start chat, avoid stale element exception
+    wait_find_and_click(driver, 1, By.XPATH, f"//*[text()='{target_chat}']") # click on profile and start chat, avoid stale element exception
     wait_find_and_click(driver, 1, By.CLASS_NAME, "talk-button")  # click on talk button to start chat
     clear_chat(driver) # too many messages can couse problems
 

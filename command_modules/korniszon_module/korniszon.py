@@ -29,7 +29,6 @@ def korniszon_cleanup(korniszon_input: str) -> str:
     korniszon_input = korniszon_input.lower() # make words lowercase so they look better
     korniszon_input = korniszon_input.rstrip() # remove spaces after string, so there are no doubles counted as diffrent word with spaces at the end
     korniszon_input = ''.join([char for char in korniszon_input if char.isalpha() or char == " "]) # clear the word from anything else than letters and spaces
-    
  
     return korniszon_input
     

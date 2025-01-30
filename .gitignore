@@ -3,6 +3,7 @@
 /.pytest_cache/
 /dist/
 /.vscode/
+/None/
 
 # Cache directories
 __pycache__/

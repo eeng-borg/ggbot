@@ -37,6 +37,20 @@ def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText)
     element.send_keys(inputText + Keys.ENTER)
 
 
+async def async_wait_find_input_send_keys(context, waitTime, by, elementName, inputText):
+    # for attempt in range(3):  # Retry up to 3 times
+    #     try:
+            # Wait for the element to be present
+    WebDriverWait(context, waitTime + 10).until(
+        EC.presence_of_element_located((by, elementName))
+    )
+    # Find and interact with the element
+    element = context.find_element(by, elementName)
+    element.clear()
+    element.send_keys(inputText + Keys.ENTER)
+    
+
+
     #         return  # Exit the function if successful
     #     except StaleElementReferenceException:
     #         # Log a message or retry finding the element

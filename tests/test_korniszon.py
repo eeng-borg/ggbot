@@ -1,6 +1,8 @@
 import pytest
 from unittest.mock import patch
 from command_modules.korniszon_module.korniszon import score_characters_value, score_vowels_percent, score_repetitions, send_results, score_lenght
+import random
+
 
 class SharedData:
     base_score = 10
@@ -73,7 +75,7 @@ class TestScoreLenght:
         ("korniszonkorniszon", 4.44),
         ])    
     def test_score_lenght_with_mock(self, text, result):
-        with patch("random.randint", return_value = 9):  # Mock random.randint to always return 9
+        with patch("random.randint", return_value = 9):  # Mock random.randint to always return 9        
             
             assert round(score_lenght(SharedData.base_score, text), 2) == result  # Replace with the expected result
             print("Test passed!")

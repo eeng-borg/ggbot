@@ -104,7 +104,7 @@ class Leaderboard:
         try:
             if len(input_list) >= 2:
                 from_index = int(input_list[0]) - 1
-                to_index = int(input_list[1]) - 1
+                to_index = int(input_list[1])
 
             elif len(input_list) == 1:
                 to_index = int(input_list[0])
@@ -135,7 +135,7 @@ class Leaderboard:
         print(f"Kalkuluj: {index_range} = {to_index} - {from_index}")
 
         if index_range > max_range:
-            to_index = to_index - (index_range - max_range) + 1
+            to_index = to_index - (index_range - max_range)
             response = f"Hola komboju <luzik> {index_range} nie dostaniesz, masz 30."
             wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
             time.sleep(1)
