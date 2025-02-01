@@ -20,7 +20,7 @@ def get_image_link(driver: webdriver.Chrome) -> str|None:
     iframe = wait_find_and_return(driver, 1, By.XPATH, "//iframe[@id='OverlayIFrame']")
     driver.switch_to.frame(iframe)
 
-    # find element with generted image 
+    # find element with generted image
     imgContainer = wait_find_and_return(driver, 1, By.CLASS_NAME, "imgContainer") # check if image container is present
     imgElement = wait_find_and_return(imgContainer, 1, By.TAG_NAME, "img") # check if image is present
 
@@ -32,9 +32,12 @@ def get_image_link(driver: webdriver.Chrome) -> str|None:
         print("Image src attribute is None")
 
     # cleanup bing tab
-    wait_find_and_click(driver, 1, By.XPATH, "//*[(@data-tooltip='Zamknij obraz')]") # close image Iframe
+    print("Zamykam obraz") 
+    # class="close nofocus"
+    wait_find_and_click(driver, 1, By.XPATH, "//*[(@class='close nofocus')]") # close image Iframe
     driver.switch_to.default_content() # Exit iframe and switch back to the main document
     
+    print("Obraz zamknięty, zwracam link")
     return image_link
 
 
@@ -46,7 +49,8 @@ def send_image(driver: webdriver.Chrome, image_link: str|None, tabs: Dict[str,st
         chatMsg = "Nie udało się wygenerować obrazu"
     else:
         chatMsg = image_link
-        
+    
+    print("Wysyłam obraz na czat")
     wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", chatMsg)
 
 

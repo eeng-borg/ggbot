@@ -5,12 +5,13 @@ from selenium.webdriver.common.by import By
 import sys
 import io
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 import asyncio
 from selenium.common.exceptions import TimeoutException
 from utils.utilities import wait_find_input_and_send_keys, clear_chat
 from innit_bot import innit_bot
 import logging as Log
+import platform
 
 
 from command_modules.binguj import binguj
@@ -27,68 +28,97 @@ from command_modules.command import Command
 # sys.stdout.reconfigure(encoding='utf-8')
 # setup chrome profile, so it doesn't ask for logins
 
+print("Odpalił")
+load_dotenv(find_dotenv())
+os_type = platform.system()
 
-load_dotenv()
 
 
-def create_driver(user_data_dir) -> webdriver.Chrome:
+def create_driver() -> webdriver.Chrome:
 
+    print("Driver created")
     chrome_options = Options()
+    
 
-    # Use a different user data directory for each instance
-    profile_path = os.getenv('PROFILE_PATH')
-    chrome_options.add_argument(f"--user-data-dir={profile_path}")
-    chrome_options.add_argument(f"--profile-directory={user_data_dir}")  # Default profile directory
+    # Prevent Chrome from closing due to multiple instances
+    chrome_options.add_argument("--disable-session-crashed-bubble")
+    chrome_options.add_argument("--disable-application-cache")
 
     # Enable headless mode for production
-    if hasattr(sys, "_MEIPASS"):
-        chrome_options.add_argument("--headless")  # Run Chrome in headless mode
-        chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (recommended in headless mode)
-        chrome_options.add_argument("--no-sandbox")  # Disable sandboxing for headless mode (some environments need this)
+    # if hasattr(sys, "_MEIPASS"):
+    # if os_type == "Linux":
+    chrome_options.add_argument("--headless=new")  # Run Chrome in headless mode
+    chrome_options.add_argument("--start-maximized") # so it looks more human-like
+    chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (recommended in headless mode)
+    chrome_options.add_argument("--no-sandbox")  # Disable sandboxing for headless mode (some environments need this)
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Prevent detection
+    chrome_options.add_argument("--window-size=800x600")  # Ensure proper rendering
 
     
     # Avoid Chrome crash by disabling shared memory
     chrome_options.add_argument("--disable-dev-shm-usage")
 
-
     # setup chrome driver
+    
+    
     try:
-        service = Service(executable_path='chromedriver.exe')
+        if os_type == "Linux":
+            print("Running on Linux server")
+            service = Service("/usr/local/bin/chromedriver")
+            user_data_dir = os.getenv('PROD_PROFILE') # production
+
+        elif os_type == "Windows":
+            print("Running on Windows local")
+            service = Service("./chromedriver.exe") #change to exe for windows
+            user_data_dir = os.getenv('DEV_PROFILE') # development
+            
+
         
+        # Use a different user data directory for each instance
+        profile_path = os.getenv('PROFILE_PATH')
+        chrome_options.add_argument(f"--user-data-dir={profile_path}")
+        chrome_options.add_argument(f"--profile-directory={user_data_dir}")  # Default profile directory
+
+        
+        # create a driver
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
     except Exception as e:
         print(f"Error initializing the Chrome driver: {e}")
         exit(1)
 
-
     return driver
 
 
-# get a diffrent chrome profile and gg chat depending if run it on exe or vscode
-if hasattr(sys, "_MEIPASS"):
-    # Running as an EXE
-    profile = os.getenv('PROD_PROFILE') # production
-    chat = 'Komfa'
 
-    print("Running as a standalone EXE")
+# for testing purposes, if there argument "test", start chat with me (testing). Otherwise start chat with Komfa
+
+if len(sys.argv) > 1:
+    arg = sys.argv[1]  # Get the first argument passed (in this case, "test")
+    
+    if arg == "test":
+        print("Test version.")
+        chat = os.getenv('TEST_CHAT')
+
+        if not chat:
+            print("TEST_CHAT environment variable not found!")
+        else:
+            print("TEST_CHAT =", chat)
+
+    else:
+        print(f"Unknown argument: {arg}")
 
 else:
-    # Running in normal Python (VS Code, terminal, etc.)
-    profile = os.getenv('DEV_PROFILE') # development
-    test_chat = os.getenv('TEST_CHAT')
-
-    chat = test_chat # test chat
-    print("Running in a normal Python environment")
+    chat = 'Komfa'
 
 
-driver = create_driver(profile)
 
-
-# print(f"user-data-dir={default_profile_path}")
+driver = create_driver()
 
 # initialize bot and return tabs
 tabs = innit_bot(driver, chat)
+print("Bot initiaindi completed")
 
 # for testing purposes automatically send command
 # wait_find_input_and_send_keys(driver, 5, By.ID, "chat-text", "/binguj gf fdfd")
@@ -103,6 +133,7 @@ ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych kornis
 user_korniszon_stats_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
 restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
+# exit_command = Command(driver, 'exit', "wychodzi <lol>")
 
 leaderboard = Leaderboard()
 leaderboard.load_leaderboard()
@@ -123,11 +154,11 @@ while(True):
                 binguj(driver, str(data["input"]), tabs)  # Call Binguj function with the command as an argument
         
 
-        bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
+        # bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
 
-        if bingus_gpt_commands_data:
-            for data in bingus_gpt_commands_data:
-                bingus_gpt(driver, data, tabs)
+        # if bingus_gpt_commands_data:
+        #     for data in bingus_gpt_commands_data:
+        #         bingus_gpt(driver, data, tabs)
         
 
         korniszon_commands_data = korniszon_command.get_commands_data()
@@ -178,8 +209,16 @@ while(True):
                 clear_chat(driver) # list of commands can trigger some commands
 
 
+        # exit_commands_data = exit_command.get_commands_data()
+
+        # if exit_commands_data:
+        #     exit(1)
+
+
     except TimeoutException:
         print("Timeout occurred while executing function")
+        driver.save_screenshot("debug_screenshot2.png")
+
         driver.switch_to.window(tabs["main tab"])
         wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Coś sie nie udało ;(")
         continue    
@@ -188,3 +227,4 @@ while(True):
         print(f"Unexpected error: {type(e).__name__}, {e}")
         driver.switch_to.window(tabs["main tab"])
         continue
+    
