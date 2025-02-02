@@ -16,7 +16,7 @@ class SpamKorniszon:
     def spamming(self, driver: webdriver.Chrome, leaderboard: Leaderboard):
 
         SpamKorniszon.counting += 1/30
-        print(f"Minął czas: {SpamKorniszon.counting} > {SpamKorniszon.spam_time}")
+        # print(f"Minął czas: {SpamKorniszon.counting} > {SpamKorniszon.spam_time}")
 
         if SpamKorniszon.counting > SpamKorniszon.spam_time:
 
