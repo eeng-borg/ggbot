@@ -155,7 +155,7 @@ class Leaderboard:
                 if user:
                     response += f" ({user})"
 
-                wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)
+                wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)                
 
             else:
                 response = "Nic tu nie ma, zrób najpierw jakieś korniszony może :)"

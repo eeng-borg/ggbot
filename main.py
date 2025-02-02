@@ -21,7 +21,7 @@ from command_modules.bingus_gpt import bingus_gpt
 from command_modules.korniszon_module.korniszon import korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from command_modules.korniszon_module.best_korniszon_by_day import best_korniszon_by_day 
-from command_modules.korniszon_module.random_korniszon import post_random_korniszon
+from command_modules.korniszon_module.random_korniszon import SpamKorniszon
 from command_modules.command import Command
 
 
@@ -99,7 +99,6 @@ def create_driver() -> webdriver.Chrome:
     return driver
 
 
-
 # for testing purposes, if there argument "test", start chat with me (testing). Otherwise start chat with Komfa
 
 if os_type == "Linux":
@@ -132,14 +131,13 @@ help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro ju
 
 leaderboard = Leaderboard()
 leaderboard.load_leaderboard()
-
+spam_korniszon = SpamKorniszon()
 
 # main loop for bot operations
 while(True):
 
     # try to catch exceptions if command is found
     try:
-
         # check chat for commands and return data of them
         binguj_commads_data = binguj_command.get_commands_data()
         korniszon_commands_data = korniszon_command.get_commands_data()
@@ -152,9 +150,10 @@ while(True):
         # bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
 
         # functions not called by a command
-        # asyncio.run(post_random_korniszon(driver, leaderboard))
+        spam_korniszon.spamming(driver, leaderboard)
 
-        # functions called with a command        
+
+        # functions called with a command
         if Command.is_any_command_found:
 
             if binguj_commads_data:
@@ -171,7 +170,13 @@ while(True):
 
             if spam_commands_data:
                 for data in spam_commands_data:
-                    korniszon(driver, data, leaderboard)
+                    try:
+                        print(f"spam: {int(data['input'])}")                        
+                        SpamKorniszon.spam_time = int(data['input'])
+                        print(f"spam korniszon: {SpamKorniszon.spam_time}")
+
+                    except ValueError:
+                        continue
 
             if torniszon_commands_data:
                 for data in torniszon_commands_data:
