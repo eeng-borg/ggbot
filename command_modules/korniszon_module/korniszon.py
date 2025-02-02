@@ -5,6 +5,7 @@ import random
 from utils.types import CommandData
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from typing import List
+from datetime import datetime
 
 # Log.basicConfig(level=Log.INFO)
 
@@ -141,36 +142,79 @@ def score_lenght(score, korniszon_input):
     return round(score, 2)
 
 
-def send_results(driver, score, korniszon_input, position):
-    emotka = ""
+def calculate_time(leaderboard: Leaderboard):
 
-    if score > 500:
-        emotka = "! :o"
-    elif score > 300:
-        emotka = "! <hura>"
-    elif score > 200:
-        emotka = "! :>"
-    elif score > 150:
-        emotka = ". ;>"
-    elif score == 131.72:
-        emotka = ". :))"
-    elif score > 100:
-        emotka = ". <myśli>"
-    elif score == 21.37:
-        emotka = ". <lol>"
-    elif score > 75:
-        emotka = ".. :/"
-    elif score > 50:
-        emotka = ".. <palacz>"
-    elif score > 0:
-        emotka = "... ;("
-    elif score == 00.10:
-        emotka = "... <leje>"
-    elif score == 0:
-        emotka = "..... <idiota>"
+    second_place = leaderboard.leaderboard[1]    
+    
+    years = datetime.now().year - second_place.get('time')['year']
+    months = datetime.now().month - second_place.get('time')['month']
+    days = datetime.now().day - second_place.get('time')['day']
+    hours = datetime.now().hour - second_place.get('time')['hour']
+    minutes = datetime.now().minute - second_place.get('time')['minute']
 
-    response = (f"{korniszon_input} zdobył {score} punktów{emotka}\n"
-    f"Zajął {position} miejsce.")
+    czas = ''
+
+    if years > 0:
+        czas = f"{years} lat "
+
+    if months > 0:
+        czas += f"{months} miesięcy "
+
+    if days > 0:
+        czas += f"{days} dni "
+
+    if hours > 0:
+        czas += f"{hours} godzin "
+
+    if minutes > 0:
+        czas += f"{minutes} minut "        
+
+    return czas
+
+
+def send_results(driver: webdriver.Chrome, score, korniszon_input, position, leaderboard: Leaderboard):
+
+    # special message if korniszon get top place
+    if position == 1:
+
+        second_place = leaderboard.leaderboard[1]
+        input = second_place.get('input')
+
+        response = (f"<paker>!! {korniszon_input} zdobył {score} punktów, zajął 1 miejsce i został nowym liderem rankingu!! <paker>\n")
+                    # f"<paker> {input} był na szczycie przez {calculate_time(leaderboard)} <paker>")
+        
+    # for other positions
+    else:
+        emotka = ""
+
+        if score > 500:
+            emotka = "! :o"
+        elif score > 300:
+            emotka = "! <hura>"
+        elif score > 200:
+            emotka = "! :>"
+        elif score > 150:
+            emotka = ". ;>"
+        elif score == 131.72:
+            emotka = ". :))"
+        elif score > 100:
+            emotka = ". <myśli>"
+        elif score == 21.37:
+            emotka = ". <lol>"
+        elif score > 75:
+            emotka = ".. :/"
+        elif score > 50:
+            emotka = ".. <palacz>"
+        elif score > 0:
+            emotka = "... ;("
+        elif score == 00.10:
+            emotka = "... <leje>"
+        elif score == 0:
+            emotka = "..... <idiota>"
+
+        response = (f"{korniszon_input} zdobył {score} punktów{emotka}\n"
+        f"Zajął {position} miejsce.")
+
     wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)
 
 
@@ -244,6 +288,8 @@ def korniszon(driver: webdriver.Chrome, korniszon_data: CommandData, leaderboard
     # send the message on gg how much point your korniszon earned and what position it has on leaderbord
     position = leaderboard.get_position(korniszon_input)
 
-    send_results(driver, score, korniszon_input, position)
+    calculate_time(leaderboard)
+
+    send_results(driver, score, korniszon_input, position, leaderboard)
     print(f"Full score: {round(score, 2)}")
 

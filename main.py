@@ -12,6 +12,8 @@ from utils.utilities import wait_find_input_and_send_keys, clear_chat
 from innit_bot import innit_bot
 import logging as Log
 import platform
+import traceback
+from datetime import datetime
 
 
 from command_modules.binguj import binguj
@@ -32,8 +34,17 @@ print("Odpalił")
 load_dotenv(find_dotenv())
 os_type = platform.system()
 
+# create crash logs file
+def log_exception(exc_type, exc_value, exc_traceback):
+    with open("crash-log.log", "a", encoding="utf-8") as f:
+        f.write(f"{datetime.now()}\n\n") # when error happend
+        f.write("".join(traceback.format_exception(exc_type, exc_value, exc_traceback)))        
+        f.write("\n" + "="*80 + "\n")  # separator for clarity
+
+sys.excepthook = log_exception
 
 
+# driver
 def create_driver() -> webdriver.Chrome:
 
     print("Driver created")
@@ -94,23 +105,11 @@ def create_driver() -> webdriver.Chrome:
 
 # for testing purposes, if there argument "test", start chat with me (testing). Otherwise start chat with Komfa
 
-if len(sys.argv) > 1:
-    arg = sys.argv[1]  # Get the first argument passed (in this case, "test")
-    
-    if arg == "test":
-        print("Test version.")
-        chat = os.getenv('TEST_CHAT')
+if os_type == "Linux":
+    chat = 'Komfa'    
 
-        if not chat:
-            print("TEST_CHAT environment variable not found!")
-        else:
-            print("TEST_CHAT =", chat)
-
-    else:
-        print(f"Unknown argument: {arg}")
-
-else:
-    chat = 'Komfa'
+elif os_type == "Windows":
+    chat = os.getenv('TEST_CHAT')
 
 
 
@@ -133,7 +132,6 @@ ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych kornis
 user_korniszon_stats_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
 restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
-# exit_command = Command(driver, 'exit', "wychodzi <lol>")
 
 leaderboard = Leaderboard()
 leaderboard.load_leaderboard()
@@ -207,12 +205,6 @@ while(True):
             for data in help_commands_data:
                 Command.help()
                 clear_chat(driver) # list of commands can trigger some commands
-
-
-        # exit_commands_data = exit_command.get_commands_data()
-
-        # if exit_commands_data:
-        #     exit(1)
 
 
     except TimeoutException:
