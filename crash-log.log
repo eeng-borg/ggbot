@@ -1,8 +1,0 @@
-2025-02-02 10:14:27.858193
-
-Traceback (most recent call last):
-  File "c:\Users\gordi\OneDrive\Dokumenty\Python_projects\ggbot\main.py", line 46, in <module>
-    raise ValueError("Testowy błąd")
-ValueError: Testowy błąd
-
-================================================================================
