@@ -13,6 +13,7 @@ __pycache__/
 .env
 .project
 .pydevproject
+.log
 
 main.spec
 pomysły_todo

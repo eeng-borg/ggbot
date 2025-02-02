@@ -8,8 +8,13 @@ from typing import List
 
 class Command:
 
+    # -- CLASS ATRIBUTES 
     # List of all commands and their descriptions, to use in help command
     command_type_list = []
+
+    # this flag is triggered after any command is found, so then we can run clear_chat() after the last command logic was executed
+    is_any_command_found = False
+
 
     def __init__(self, driver: webdriver.Chrome, command_name: str, description: str):
 
@@ -32,28 +37,28 @@ class Command:
 
         return xpath
     
-    # WIP - not implemented
-    # Find the nickname of the user who sent the command. If someone wrote multiple messages in a row, 
-    # find their first message to get the element with the nickname.
-    def get_command_elements(self):
+    # # WIP - not implemented
+    # # Find the nickname of the user who sent the command. If someone wrote multiple messages in a row, 
+    # # find their first message to get the element with the nickname.
+    # def get_command_elements(self):
 
-        # Only incoming messages, so the bot can ignore itself (outgoing messages)
-        incoming_messages = self.driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
+    #     # Only incoming messages, so the bot can ignore itself (outgoing messages)
+    #     incoming_messages = self.driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
 
-        command_elements = []
+    #     command_elements = []
 
-        if incoming_messages:
-                for message in reversed(incoming_messages):
-                    # print(f"Znaleziono: {len(incoming_messages)} wiadomości")
-                    # xpath to find specific commands in the chat
-                    xpath = self.__commandXpath()
-                    raw_command_element = message.find_elements(By.XPATH, f".{xpath}")  # Wait until the command is found and make a list of them 
+    #     if incoming_messages:
+    #             for message in reversed(incoming_messages):
+    #                 # print(f"Znaleziono: {len(incoming_messages)} wiadomości")
+    #                 # xpath to find specific commands in the chat
+    #                 xpath = self.__commandXpath()
+    #                 raw_command_element = message.find_elements(By.XPATH, f".{xpath}")  # Wait until the command is found and make a list of them 
 
-                    if raw_command_element:
-                        command_elements.append(message)
+    #                 if raw_command_element:
+    #                     command_elements.append(message)
 
-                return command_elements
-        
+    #             return command_elements
+
     
     def __get_input(self, raw_command_element):
         input = raw_command_element.text.lstrip(f"/{self.command_name}")
@@ -62,7 +67,7 @@ class Command:
 
         return input
     
-
+    # if user makes several commands at the same time, function will only catch
     def get_commands_data(self) -> List[CommandData]:
 
         received_commands = [] # list of all commands found in the chat before clearing it
@@ -95,6 +100,9 @@ class Command:
                 # when the command message is found, contionue iterating up trough incoming messages until you get the one
                 # that contains the username
                 if is_command_found:
+
+                    Command.is_any_command_found = True
+                    
                     nickname_elements = message.find_elements(By.CLASS_NAME, "ml__item-username")
                     print(f"Nick found: {len(nickname_elements)}")
 

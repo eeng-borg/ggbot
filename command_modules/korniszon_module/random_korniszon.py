@@ -7,7 +7,7 @@ import asyncio
 import random
 
 
-async def post_random_korniszon(driver: webdriver.Chrome, leaderboard: Leaderboard, spam = 200):
+async def post_random_korniszon(driver: webdriver.Chrome, leaderboard: Leaderboard, spam = 2):
 
     await asyncio.sleep(spam) #900
     leaderboard.load_leaderboard()

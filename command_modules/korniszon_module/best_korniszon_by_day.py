@@ -8,7 +8,6 @@ from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return,
 
 def best_korniszon_by_day(driver: webdriver.Chrome, data: CommandData, leaderboard: Leaderboard):
 
-    clear_chat(driver)
 
     day_input = data.get('input')
     response = ''

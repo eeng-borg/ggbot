@@ -230,8 +230,6 @@ def korniszon(driver: webdriver.Chrome, korniszon_data: CommandData, leaderboard
 
     korniszon_input = korniszon_data["input"]
 
-    # so it doesn't take the same word again
-    clear_chat(driver)
 
     # leaderboard = Leaderboard()
     leaderboard.load_leaderboard()

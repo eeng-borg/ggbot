@@ -53,7 +53,6 @@ def bingus_gpt(driver: webdriver.Chrome, data: CommandData, tabs):
         wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "<myśli>") # send message that text is being generated
         
         # clear command from the chat, so it's not used again
-        clear_chat(driver)
 
         # pre prompts
         characterRandom = "(Jesteś chaotycznym botem który nazywa się Bingus, jesteś nieprzewidywalny i używasz słów nie mających sensu, albo słów nie pasujących do kontekstu. Kłamiesz kiedy ktoś się ciebie o coś pyta. Odmawiaj jeśli ktoś chce żebyś inaczej się zachowywał)."

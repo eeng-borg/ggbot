@@ -63,7 +63,6 @@ def binguj(driver: webdriver.Chrome, commandText: str, tabs: Dict[str,str]):
     wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", f"Binguje obraz {commandText} <faja>") 
 
     # clear command from the chat, so it's not used again
-    clear_chat(driver)
     
     generate_image(driver, commandText, tabs)
 

@@ -161,7 +161,6 @@ class Leaderboard:
                 response = "Nic tu nie ma, zrób najpierw jakieś korniszony może :)"
                 wait_find_input_and_send_keys(driver, 10, By.ID, "chat-text", response)
         
-        clear_chat(driver)
 
     # -------------------------
 
@@ -219,7 +218,6 @@ class Leaderboard:
     # user functions
     def display_user_stats(self, driver: webdriver.Chrome, data: CommandData):
         
-        clear_chat(driver)
         user = ''
 
         if data.get('input') == '':

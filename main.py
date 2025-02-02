@@ -30,7 +30,8 @@ from command_modules.command import Command
 # sys.stdout.reconfigure(encoding='utf-8')
 # setup chrome profile, so it doesn't ask for logins
 
-print("Odpalił")
+print("Running")
+
 load_dotenv(find_dotenv())
 os_type = platform.system()
 
@@ -57,22 +58,19 @@ def create_driver() -> webdriver.Chrome:
 
     # Enable headless mode for production
     # if hasattr(sys, "_MEIPASS"):
-    # if os_type == "Linux":
-    chrome_options.add_argument("--headless=new")  # Run Chrome in headless mode
-    chrome_options.add_argument("--start-maximized") # so it looks more human-like
-    chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (recommended in headless mode)
-    chrome_options.add_argument("--no-sandbox")  # Disable sandboxing for headless mode (some environments need this)
-    chrome_options.add_argument("--remote-debugging-port=9222")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Prevent detection
-    chrome_options.add_argument("--window-size=800x600")  # Ensure proper rendering
+    if os_type == "Linux":
+        chrome_options.add_argument("--headless=new")  # Run Chrome in headless mode
+        chrome_options.add_argument("--start-maximized") # so it looks more human-like
+        chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (recommended in headless mode)
+        chrome_options.add_argument("--no-sandbox")  # Disable sandboxing for headless mode (some environments need this)
+        chrome_options.add_argument("--remote-debugging-port=9222")
+        chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Prevent detection
+        chrome_options.add_argument("--window-size=800x600")  # Ensure proper rendering
 
     
     # Avoid Chrome crash by disabling shared memory
     chrome_options.add_argument("--disable-dev-shm-usage")
 
-    # setup chrome driver
-    
-    
     try:
         if os_type == "Linux":
             print("Running on Linux server")
@@ -82,8 +80,7 @@ def create_driver() -> webdriver.Chrome:
         elif os_type == "Windows":
             print("Running on Windows local")
             service = Service("./chromedriver.exe") #change to exe for windows
-            user_data_dir = os.getenv('DEV_PROFILE') # development
-            
+            user_data_dir = os.getenv('DEV_PROFILE') # development         
 
         
         # Use a different user data directory for each instance
@@ -112,11 +109,10 @@ elif os_type == "Windows":
     chat = os.getenv('TEST_CHAT')
 
 
-
-driver = create_driver()
-
 # initialize bot and return tabs
+driver = create_driver()
 tabs = innit_bot(driver, chat)
+
 print("Bot initiaindi completed")
 
 # for testing purposes automatically send command
@@ -127,6 +123,7 @@ print("Bot initiaindi completed")
 binguj_command = Command(driver, 'binguj', "wpisz prompty na obrazek jaki chcesz wygenerować :)")
 bingus_gpt_command = Command(driver, 'bingus', "zapytaj się bingusa o cokolwiek, może pomoże ;>")
 korniszon_command = Command(driver, 'korniszon', "pokaż swojego korniszona, ocenimy uczciwie ;))")
+spam_command = Command(driver, 'spam', "co ile sekund ma spamować korniszonami <chatownik>") 
 torniszon_command = Command(driver, 'topniszon', "najlepszy korniszon z dziś <okularnik>")
 ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych korniszonów w kosmosie!! Podaj 1-2 numery, aby określić zakres.")
 user_korniszon_stats_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
@@ -142,69 +139,66 @@ while(True):
 
     # try to catch exceptions if command is found
     try:
-        # asyncio.run(post_random_korniszon(driver, leaderboard))
 
-        # checks if any commands are found
+        # check chat for commands and return data of them
         binguj_commads_data = binguj_command.get_commands_data()
-
-        if binguj_commads_data:
-            for data in binguj_commads_data: # prompt returns a list of tuples with prompt and nickname
-                binguj(driver, str(data["input"]), tabs)  # Call Binguj function with the command as an argument
-        
-
+        korniszon_commands_data = korniszon_command.get_commands_data()
+        spam_commands_data = spam_command.get_commands_data()
+        torniszon_commands_data = torniszon_command.get_commands_data()
+        ranking_commands_data = ranking_command.get_commands_data()
+        user_stats_data = user_korniszon_stats_command.get_commands_data()
+        restart_commands_data = restart_command.get_commands_data()
+        help_commands_data = help_command.get_commands_data()
         # bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
 
-        # if bingus_gpt_commands_data:
-        #     for data in bingus_gpt_commands_data:
-        #         bingus_gpt(driver, data, tabs)
+        # functions not called by a command
+        # asyncio.run(post_random_korniszon(driver, leaderboard))
+
+        # functions called with a command        
+        if Command.is_any_command_found:
+
+            if binguj_commads_data:
+                for data in binguj_commads_data: # prompt returns a list of tuples with prompt and nickname
+                    binguj(driver, str(data["input"]), tabs)  # Call Binguj function with the command as an argument
+
+            # if bingus_gpt_commands_data:
+            #     for data in bingus_gpt_commands_data:
+            #         bingus_gpt(driver, data, tabs)    
+
+            if korniszon_commands_data:
+                for data in korniszon_commands_data:
+                    korniszon(driver, data, leaderboard)
+
+            if spam_commands_data:
+                for data in spam_commands_data:
+                    korniszon(driver, data, leaderboard)
+
+            if torniszon_commands_data:
+                for data in torniszon_commands_data:
+                    best_korniszon_by_day(driver, data, leaderboard)
+
+            if ranking_commands_data:
+                for data in ranking_commands_data:
+                    leaderboard.load_leaderboard()
+                    leaderboard.display_leaderboard(driver, data["input"])
+
+            if user_stats_data:
+                for data in user_stats_data:
+                    leaderboard.load_leaderboard()
+                    leaderboard.display_user_stats(driver, data)
+
+            if restart_commands_data:
+                for data in restart_commands_data:
+                    wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
+                    innit_bot(driver, chat)        
+
+            if help_commands_data:
+                for data in help_commands_data:
+                    Command.help()
         
-
-        korniszon_commands_data = korniszon_command.get_commands_data()
-
-        if korniszon_commands_data:
-            for data in korniszon_commands_data:
-                korniszon(driver, data, leaderboard)
-
-                
-        torniszon_commands_data = torniszon_command.get_commands_data()
-
-        if torniszon_commands_data:
-            for data in torniszon_commands_data:
-                best_korniszon_by_day(driver, data, leaderboard)
-
-
-        ranking_commands_data = ranking_command.get_commands_data()
-
-        if ranking_commands_data:
-            for data in ranking_commands_data:
-                leaderboard.load_leaderboard()
-                leaderboard.display_leaderboard(driver, data["input"])
-
-
-        # user_korniszon_stats_command
-        user_stats_data = user_korniszon_stats_command.get_commands_data()
-
-        if user_stats_data:
-            for data in user_stats_data:
-                leaderboard.load_leaderboard()
-                leaderboard.display_user_stats(driver, data)
-                
-
-        #restart a bot
-        restart_commands_data = restart_command.get_commands_data()
-
-        if restart_commands_data:
-            for data in restart_commands_data:
-                wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
-                innit_bot(driver, chat)
-
-
-        help_commands_data = help_command.get_commands_data()
-
-        if help_commands_data:
-            for data in help_commands_data:
-                Command.help()
-                clear_chat(driver) # list of commands can trigger some commands
+            # after we checked the chat for commands, clear it from the messages so we won't use them again.
+            clear_chat(driver)
+            Command.is_any_command_found = False
 
 
     except TimeoutException:
