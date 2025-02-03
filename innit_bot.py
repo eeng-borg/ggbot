@@ -3,6 +3,9 @@ from selenium.webdriver.common.by import By
 from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
 from typing import Dict
 import time
+import platform
+import os
+
 
 def set_gpt_charcter(driver: webdriver.Chrome, gpt_tab: str):
 
@@ -13,7 +16,8 @@ def set_gpt_charcter(driver: webdriver.Chrome, gpt_tab: str):
     wait_find_input_and_send_keys(driver, 1, By.XPATH, xpathSend, characterFaja)
 
 
-def innit_bot(driver: webdriver.Chrome, target_chat) -> Dict[str,str]:
+def innit_bot(driver: webdriver.Chrome) -> Dict[str,str]:
+
     print("Bot innitated")
     # Close all tabs except the first one to perform a clean start
     main_tab = driver.window_handles[0]  # Store the first tab
@@ -37,10 +41,17 @@ def innit_bot(driver: webdriver.Chrome, target_chat) -> Dict[str,str]:
 
     # time.sleep(10)
     driver.save_screenshot("debug_screenshot.png")
+    os_type = platform.system()
 
-    wait_find_and_click(driver, 1, By.XPATH, f"//*[text()='{target_chat}']") # click on profile and start chat, avoid stale element exception
+    if os_type == "Linux":
+        chat = 'Komfa'
+
+    elif os_type == "Windows":
+        chat = os.getenv('TEST_CHAT')
+
+    wait_find_and_click(driver, 1, By.XPATH, f"//*[text()='{chat}']") # click on profile and start chat, avoid stale element exception
     wait_find_and_click(driver, 1, By.CLASS_NAME, "talk-button")  # click on talk button to start chat
-    clear_chat(driver) # too many messages can couse problems
+    # clear_chat(driver) # too many messages can couse problems
 
     driver.execute_script("window.open('https://www.bing.com/images/create');") # open bing ai on new tab
     bing_tab = driver.window_handles[-1]

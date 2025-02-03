@@ -5,13 +5,14 @@ from selenium.webdriver.common.by import By
 import sys
 import io
 import os
+import platform
 from dotenv import load_dotenv, find_dotenv
 import asyncio
 from selenium.common.exceptions import TimeoutException
 from utils.utilities import wait_find_input_and_send_keys, clear_chat
 from innit_bot import innit_bot
 import logging as Log
-import platform
+
 import traceback
 from datetime import datetime
 
@@ -33,7 +34,6 @@ from command_modules.command import Command
 print("Running")
 
 load_dotenv(find_dotenv())
-os_type = platform.system()
 
 # create crash logs file
 def log_exception(exc_type, exc_value, exc_traceback):
@@ -58,6 +58,8 @@ def create_driver() -> webdriver.Chrome:
 
     # Enable headless mode for production
     # if hasattr(sys, "_MEIPASS"):
+    os_type = platform.system()
+
     if os_type == "Linux":
         chrome_options.add_argument("--headless=new")  # Run Chrome in headless mode
         chrome_options.add_argument("--start-maximized") # so it looks more human-like
@@ -101,16 +103,12 @@ def create_driver() -> webdriver.Chrome:
 
 # for testing purposes, if there argument "test", start chat with me (testing). Otherwise start chat with Komfa
 
-if os_type == "Linux":
-    chat = 'Komfa'
 
-elif os_type == "Windows":
-    chat = os.getenv('TEST_CHAT')
 
 
 # initialize bot and return tabs
 driver = create_driver()
-tabs = innit_bot(driver, chat)
+tabs = innit_bot(driver)
 
 print("Bot initiaindi completed")
 
@@ -155,6 +153,7 @@ while(True):
 
         # functions called with a command
         if Command.is_any_command_found:
+            clear_chat(driver) # clear chat before exec logic, so we can still get commands which were posted during this
 
             if binguj_commads_data:
                 for data in binguj_commads_data: # prompt returns a list of tuples with prompt and nickname
@@ -185,25 +184,24 @@ while(True):
 
             if ranking_commands_data:
                 for data in ranking_commands_data:
-                    leaderboard.load_leaderboard()
+                    # leaderboard.load_leaderboard()
                     leaderboard.display_leaderboard(driver, data["input"])
 
             if user_stats_data:
                 for data in user_stats_data:
-                    leaderboard.load_leaderboard()
+                    # leaderboard.load_leaderboard()
                     leaderboard.display_user_stats(driver, data)
 
             if restart_commands_data:
                 for data in restart_commands_data:
                     wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
-                    innit_bot(driver, chat)        
+                    innit_bot(driver)        
 
             if help_commands_data:
                 for data in help_commands_data:
                     Command.help()
         
             # after we checked the chat for commands, clear it from the messages so we won't use them again.
-            clear_chat(driver)
             Command.is_any_command_found = False
 
 

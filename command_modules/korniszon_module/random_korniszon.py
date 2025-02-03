@@ -21,7 +21,7 @@ class SpamKorniszon:
 
         if SpamKorniszon.counting > SpamKorniszon.spam_time:
 
-            leaderboard.load_leaderboard()
+            # leaderboard.load_leaderboard()
             
             response = ''
             

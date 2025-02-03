@@ -232,7 +232,7 @@ def korniszon(driver: webdriver.Chrome, korniszon_data: CommandData, leaderboard
 
 
     # leaderboard = Leaderboard()
-    leaderboard.load_leaderboard()
+    # leaderboard.load_leaderboard()
 
     # if duplicates
     # print(f"Korniszon: {korniszon_input} in {leaderboard.leaderboard}")
