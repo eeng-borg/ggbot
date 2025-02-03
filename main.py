@@ -102,7 +102,7 @@ def create_driver() -> webdriver.Chrome:
 # for testing purposes, if there argument "test", start chat with me (testing). Otherwise start chat with Komfa
 
 if os_type == "Linux":
-    chat = 'Komfa'    
+    chat = 'Komfa'
 
 elif os_type == "Windows":
     chat = os.getenv('TEST_CHAT')
@@ -170,13 +170,18 @@ while(True):
 
             if spam_commands_data:
                 for data in spam_commands_data:
-                    try:
-                        print(f"spam: {int(data['input'])}")                        
-                        SpamKorniszon.spam_time = int(data['input'])
-                        print(f"spam korniszon: {SpamKorniszon.spam_time}")
+                    # spam function
+                    spam_korniszon.set_spamming_time(driver, data)
+                    # try:
+                    #     spam_time = SpamKorniszon.spam_time
+                    #     print(f"spam: {int(data['input'])}")
+                    #     spam_time = int(data['input'])
+                    #     print(f"spam korniszon: {spam_time}")
+                    #     response = f"Spam co {spam_time} pseudo sekund <w8>"
+                    #     wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
 
-                    except ValueError:
-                        continue
+                    # except ValueError:
+                    #     pass
 
             if torniszon_commands_data:
                 for data in torniszon_commands_data:

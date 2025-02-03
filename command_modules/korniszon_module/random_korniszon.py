@@ -15,7 +15,7 @@ class SpamKorniszon:
 
     def spamming(self, driver: webdriver.Chrome, leaderboard: Leaderboard):
 
-        SpamKorniszon.counting += 1/30
+        SpamKorniszon.counting += 1/20
         # print(f"Minął czas: {SpamKorniszon.counting} > {SpamKorniszon.spam_time}")
 
         if SpamKorniszon.counting > SpamKorniszon.spam_time:
@@ -31,6 +31,19 @@ class SpamKorniszon:
             wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
 
             SpamKorniszon.counting = 0
+
+
+    def set_spamming_time(self, driver: webdriver.Chrome, command_data):
+
+        try:            
+            print(f"spam: {int(command_data['input'])}")
+            SpamKorniszon.spam_time = int(command_data['input'])
+            print(f"spam korniszon: {SpamKorniszon.spam_time}")
+            response = f"Spam co {SpamKorniszon.spam_time} pseudo sekund <w8>"
+            wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
+
+        except ValueError:
+            pass
 
 
 
