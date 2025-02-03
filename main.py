@@ -170,18 +170,14 @@ while(True):
 
             if spam_commands_data:
                 for data in spam_commands_data:
-                    # spam function
-                    spam_korniszon.set_spamming_time(driver, data)
-                    # try:
-                    #     spam_time = SpamKorniszon.spam_time
-                    #     print(f"spam: {int(data['input'])}")
-                    #     spam_time = int(data['input'])
-                    #     print(f"spam korniszon: {spam_time}")
-                    #     response = f"Spam co {spam_time} pseudo sekund <w8>"
-                    #     wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
 
-                    # except ValueError:
-                    #     pass
+                    # if '-l' in data['input'] and data['user'] == 'Ing': # check for -l flag for limit and if user is admin
+                    #     input_data = data['input'].replace(' -l ','')
+                    #     SpamKorniszon.spam_limit = int(input_data)
+                    #     response = f"Limit ustawiony na {SpamKorniszon.spam_limit} szefie <faja>"
+                    #     wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
+                    # else:
+                    spam_korniszon.set_spamming_time(driver, data)
 
             if torniszon_commands_data:
                 for data in torniszon_commands_data:

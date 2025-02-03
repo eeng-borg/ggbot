@@ -11,6 +11,7 @@ class SpamKorniszon:
 
     spam_time = 30
     counting = 0
+    spam_limit = 0
 
 
     def spamming(self, driver: webdriver.Chrome, leaderboard: Leaderboard):
@@ -35,12 +36,15 @@ class SpamKorniszon:
 
     def set_spamming_time(self, driver: webdriver.Chrome, command_data):
 
-        try:            
-            print(f"spam: {int(command_data['input'])}")
-            SpamKorniszon.spam_time = int(command_data['input'])
-            print(f"spam korniszon: {SpamKorniszon.spam_time}")
-            response = f"Spam co {SpamKorniszon.spam_time} pseudo sekund <w8>"
-            wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
+        try:
+            new_spam_time = int(command_data['input'])
+            print(f"spam: {new_spam_time}")
+
+            if new_spam_time > SpamKorniszon.spam_limit:
+                SpamKorniszon.spam_time = new_spam_time
+                print(f"spam korniszon: {new_spam_time}")
+                response = f"Spam co {new_spam_time} pseudo sekund <w8>"
+                wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
 
         except ValueError:
             pass
