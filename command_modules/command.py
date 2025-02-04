@@ -4,13 +4,14 @@ from utils.types import CommandData
 from datetime import datetime
 from selenium import webdriver
 from typing import List
+from selenium.webdriver.remote.webelement import WebElement
 
 
 class Command:
 
-    # -- CLASS ATRIBUTES 
-    # List of all commands and their descriptions, to use in help command
-    command_type_list = []
+    # -- CLASS ATRIBUTES    
+    command_type_list = [] # List of all commands and their descriptions, to use in help command 
+    received_commands = [] # list of all commands extracted from messages
 
     # this flag is triggered after any command is found, so then we can run clear_chat() after the last command logic was executed
     is_any_command_found = False
@@ -24,123 +25,124 @@ class Command:
         # List of last command uses in the chat before clearing it, just for temporary use
 
         # add command name and description to use it in /help
-        Command.command_type_list.append(f"/{command_name} - {description}")
+        Command.command_type_list.append({"command_name": command_name, "description": description})
 
+    # get command name while initing
+    def __str__(self):
+        return str(self.command_name)
 
-    def __commandXpath(self):
+    @staticmethod
+    def __commandXpath(command_name):
 
         xpath = ( #image generation command
         "//*[@class='ml__item-part-content' " # if command is in the active chat
-        f"and contains(concat(' ',normalize-space(text()), ' '), ' /{self.command_name} ') "
-        f"and starts-with(normalize-space(text()), '/{self.command_name}')]"
+        f"and contains(concat(' ',normalize-space(text()), ' '), ' /{command_name} ') "
+        f"and starts-with(normalize-space(text()), '/{command_name}')]"
         )
 
         return xpath
     
-    # # WIP - not implemented
-    # # Find the nickname of the user who sent the command. If someone wrote multiple messages in a row, 
-    # # find their first message to get the element with the nickname.
-    # def get_command_elements(self):
-
-    #     # Only incoming messages, so the bot can ignore itself (outgoing messages)
-    #     incoming_messages = self.driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
-
-    #     command_elements = []
-
-    #     if incoming_messages:
-    #             for message in reversed(incoming_messages):
-    #                 # print(f"Znaleziono: {len(incoming_messages)} wiadomości")
-    #                 # xpath to find specific commands in the chat
-    #                 xpath = self.__commandXpath()
-    #                 raw_command_element = message.find_elements(By.XPATH, f".{xpath}")  # Wait until the command is found and make a list of them 
-
-    #                 if raw_command_element:
-    #                     command_elements.append(message)
-
-    #             return command_elements
-
     
-    def __get_input(self, raw_command_element):
-        input = raw_command_element.text.lstrip(f"/{self.command_name}")
+    @staticmethod
+    def __get_input_text(raw_command_element, command_name):
+        input = raw_command_element.text.lstrip(f"/{command_name}")
         input = input.strip()  # remove whitespaces from the start and end of the text
         input = filter_bmp(input)  # Filter out unsupported characters from the text
 
         return input
     
-    # if user makes several commands at the same time, function will only catch
-    def get_commands_data(self) -> List[CommandData]:
+    
+    @staticmethod
+    def __get_username(nickname_element):
+        user_nickname = nickname_element.text
+        user_nickname = user_nickname.replace(",", "") # theres a comma after a nickname ib ml__item-username text
+        user_nickname = filter_bmp(user_nickname)
 
-        received_commands = [] # list of all commands found in the chat before clearing it
-        command_data = {} # data of a single command
+        return user_nickname
+    
+    @staticmethod
+    def __make_data_dict(user_nickname, command_name, input):
 
-        # Only incoming messages, so the bot can ignore itself (outgoing messages)
-        incoming_messages = self.driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
-        is_command_found = False
+        # Add command info to the dictionary
+        command_data = {}
+        
+        command_data["user"] = user_nickname
+        command_data["command"] = command_name
+        command_data["input"] = input
 
-        if incoming_messages:
+        time = {}
 
-            input = ""
-            user_nickname = ""
-            time = {}
+        time["hour"] = datetime.now().hour
+        time["minute"] = datetime.now().minute
+        time["day"] = datetime.now().day
+        time["month"] = datetime.now().month
+        time["year"] = datetime.now().year
 
-            for message in reversed(incoming_messages):
+        command_data["time"] = time
 
-                # print(f"Znaleziono: {len(incoming_messages)} wiadomości")
-                # xpath to find specific commands in the chat
-                xpath = self.__commandXpath()
+        return command_data
+    
+
+    # look for every command in the chat before clearing it, then put them in the list with all of their data (who posted, what type of command etc.)
+    @staticmethod
+    def get_commands_data(incoming_messages: List[WebElement]):
+
+        Command.received_commands = [] # clear the list before every search, so it won't add up with old commands
+
+
+        __user_nickname = ''
+
+        for message in incoming_messages:          
+
+            # if message elements contains user nickname element, it means that the other messages below, without it, belong to the same user
+            nickname_element = message.find_elements(By.CLASS_NAME, "ml__item-username")
+
+
+            if nickname_element:
+                # Extract and clean the nickname so only string is left
+                __user_nickname = Command.__get_username(nickname_element[0])
+
+            # check for every command saved in type_list
+            for command in Command.command_type_list:
+
+                command_name = command['command_name']
+                xpath = Command.__commandXpath(command_name)
                 raw_command_element = message.find_elements(By.XPATH, f".{xpath}")  # Wait until the command is found and make a list of them
 
-                # Check if the user has sent a command and turn on a switch to look for the user's nickname
+                # one of the command is found in this message
                 if raw_command_element:
-                    print(f"Message: {raw_command_element[0].text}, remove: {self.command_name}")                
-
-                    input = self.__get_input(raw_command_element[0])
-                    is_command_found = True
-
-                # when the command message is found, contionue iterating up trough incoming messages until you get the one
-                # that contains the username
-                if is_command_found:
 
                     Command.is_any_command_found = True
-                    
-                    nickname_elements = message.find_elements(By.CLASS_NAME, "ml__item-username")
-                    print(f"Nick found: {len(nickname_elements)}")
 
-                    if nickname_elements:
-                        print(f"Nick: {nickname_elements[0].text}")
+                    # get input text from raw_command_element[0] and remove command name from it so only input text is left
+                    input = Command.__get_input_text(raw_command_element[0], command_name)
 
-                        # Extract and clean the nickname
-                        user_nickname = nickname_elements[0].text
-                        user_nickname = user_nickname.replace(",", "") # theres a comma after a nickname ib ml__item-username text
-                        user_nickname = filter_bmp(user_nickname)
+                    # combine all collected data into a dict
+                    command_data = Command.__make_data_dict(__user_nickname, command_name, input)
+                    print(command_data)
+
+                    Command.received_commands.append(command_data)
+                    print(f"Lista: {Command.received_commands}")
+
+                    break # if command is found in this message, theres not point of checking for others, 
+                            # so we skip to the next message
 
 
-                        # Add command info to the dictionary
-                        command_data["user"] = user_nickname
-                        command_data["command"] = self.command_name
-                        command_data["input"] = input
+    # function to check if a specific command type is present in received_cmd list and make list of them
+    @staticmethod
+    def get_commands_by_type(command_type):
 
-                        time["hour"] = datetime.now().hour
-                        time["minute"] = datetime.now().minute
-                        time["day"] = datetime.now().day
-                        time["month"] = datetime.now().month
-                        time["year"] = datetime.now().year
-
-                        command_data["time"] = time
-
-                        received_commands.append(command_data)
-                        print(command_data)
-
-                        # Reset the command-found flag for the next iteration
-                        is_command_found = False
-                
-
-        # it should return a list of dictionaries containing all information about the command - input, nickname, date    
-        return received_commands
-    
+        searched_commands = []
+        for command in Command.received_commands:
+            if command['command'] == command_type:
+                searched_commands.append(command)
+        
+        return searched_commands
+            
     
     # display a list of all commands and their descriptions
     @staticmethod
     def help():
-        for line in Command.command_type_list:
-            wait_find_input_and_send_keys(Command.driver, 1, By.ID, "chat-text", line)
+        for command in Command.command_type_list:
+            response = f"/{command['command_name']} - {command['description']}"
+            wait_find_input_and_send_keys(Command.driver, 1, By.ID, "chat-text", response)

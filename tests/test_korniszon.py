@@ -1,7 +1,6 @@
 import pytest
 from unittest.mock import patch
 from command_modules.korniszon_module.korniszon import score_characters_value, score_vowels_percent, score_repetitions, send_results, score_lenght
-import random
 
 
 class SharedData:

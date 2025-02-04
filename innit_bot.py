@@ -7,7 +7,7 @@ import platform
 import os
 
 
-def set_gpt_charcter(driver: webdriver.Chrome, gpt_tab: str):
+def __set_gpt_charcter(driver: webdriver.Chrome, gpt_tab: str):
 
     driver.switch_to.window(gpt_tab)
     xpathSend = '//*[@id="prompt-textarea"]'
@@ -16,36 +16,15 @@ def set_gpt_charcter(driver: webdriver.Chrome, gpt_tab: str):
     wait_find_input_and_send_keys(driver, 1, By.XPATH, xpathSend, characterFaja)
 
 
-def innit_bot(driver: webdriver.Chrome) -> Dict[str,str]:
-
-    print("Bot innitated")
-    # Close all tabs except the first one to perform a clean start
-    main_tab = driver.window_handles[0]  # Store the first tab
-
-    # Close all tabs except the first one
-    for handle in driver.window_handles:
-        driver.switch_to.window(handle)
-        if handle != main_tab:
-            driver.close()
-
-    driver.switch_to.window(main_tab)
-
-    # open tabs and prepare them for bot operations
-    driver.get('https://www.gg.pl/#latest') # open webgg page
-    print("Page title:", driver.title)
-    driver.maximize_window()
-
-    # driver.save_screenshot("debug_screenshot.png")
-
-    print("Maximized window")
-
-    # time.sleep(10)
-    driver.save_screenshot("debug_screenshot.png")
+def __open_chat(driver: webdriver.Chrome, os_type = 'Linux'):
+    
     os_type = platform.system()
 
+    # prod
     if os_type == "Linux":
         chat = 'Komfa'
 
+    # dev
     elif os_type == "Windows":
         chat = os.getenv('TEST_CHAT')
 
@@ -53,16 +32,44 @@ def innit_bot(driver: webdriver.Chrome) -> Dict[str,str]:
     wait_find_and_click(driver, 1, By.CLASS_NAME, "talk-button")  # click on talk button to start chat
     # clear_chat(driver) # too many messages can couse problems
 
+
+def innit_bot(driver: webdriver.Chrome) -> Dict[str,str]:
+
+    print("Bot innitated")
+    # Close all tabs except the first one to perform a clean start
+    main_tab = driver.window_handles[0]  # Store the first tab
+
+
+    # Close all tabs and change the first one to blank google page, because I can't just close it
+    for handle in driver.window_handles:
+        driver.switch_to.window(handle)
+        if handle == main_tab:
+            driver.get('https://www.google.com') # open blank google page as a placeholder
+        else:
+            driver.close()
+
+
+    driver.switch_to.window(main_tab)
+
+    # open tabs and prepare them for bot operations
+    driver.get('https://www.gg.pl/#latest') # open webgg page
+    print("Page title:", driver.title)
+
+    # driver.save_screenshot("debug_screenshot.png")
+
+    # choose which chat to use depending on system I use
+    __open_chat(driver)
+
     driver.execute_script("window.open('https://www.bing.com/images/create');") # open bing ai on new tab
     bing_tab = driver.window_handles[-1]
 
     # driver.execute_script("window.open('https://chatgpt.com/');") # open chatgpt on new tab
-    gpt_tab = driver.window_handles[-1]
+    # gpt_tab = driver.window_handles[-1]
 
     # # send first message on chatgpt to set up bot character, only once per session so he's not using it too much
-    # set_gpt_charcter(driver, gpt_tab)
+    # __set_gpt_charcter(driver, gpt_tab)
 
     driver.switch_to.window(main_tab) # switch to chat tab and wait for commands
     wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Jestem gotowy! <bije>") # send message that bot is ready
 
-    return {"main tab": main_tab, "bing tab": bing_tab, "gpt tab": gpt_tab}
+    return {"main tab": main_tab, "bing tab": bing_tab} #, "gpt tab": gpt_tab}

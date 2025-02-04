@@ -46,7 +46,7 @@ sys.excepthook = log_exception
 
 
 # driver
-def create_driver() -> webdriver.Chrome:
+def __create_driver() -> webdriver.Chrome:
 
     print("Driver created")
     chrome_options = Options()
@@ -82,7 +82,7 @@ def create_driver() -> webdriver.Chrome:
         elif os_type == "Windows":
             print("Running on Windows local")
             service = Service("./chromedriver.exe") #change to exe for windows
-            user_data_dir = os.getenv('DEV_PROFILE') # development         
+            user_data_dir = os.getenv('DEV_PROFILE') # development
 
         
         # Use a different user data directory for each instance
@@ -107,7 +107,7 @@ def create_driver() -> webdriver.Chrome:
 
 
 # initialize bot and return tabs
-driver = create_driver()
+driver = __create_driver()
 tabs = innit_bot(driver)
 
 print("Bot initiaindi completed")
@@ -121,9 +121,9 @@ binguj_command = Command(driver, 'binguj', "wpisz prompty na obrazek jaki chcesz
 bingus_gpt_command = Command(driver, 'bingus', "zapytaj się bingusa o cokolwiek, może pomoże ;>")
 korniszon_command = Command(driver, 'korniszon', "pokaż swojego korniszona, ocenimy uczciwie ;))")
 spam_command = Command(driver, 'spam', "co ile sekund ma spamować korniszonami <chatownik>") 
-torniszon_command = Command(driver, 'topniszon', "najlepszy korniszon z dziś <okularnik>")
+topniszon_command = Command(driver, 'topniszon', "najlepszy korniszon z dziś <okularnik>")
 ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych korniszonów w kosmosie!! Podaj 1-2 numery, aby określić zakres.")
-user_korniszon_stats_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
+staty_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
 restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
@@ -136,73 +136,95 @@ while(True):
 
     # try to catch exceptions if command is found
     try:
-        # check chat for commands and return data of them
-        binguj_commads_data = binguj_command.get_commands_data()
-        korniszon_commands_data = korniszon_command.get_commands_data()
-        spam_commands_data = spam_command.get_commands_data()
-        torniszon_commands_data = torniszon_command.get_commands_data()
-        ranking_commands_data = ranking_command.get_commands_data()
-        user_stats_data = user_korniszon_stats_command.get_commands_data()
-        restart_commands_data = restart_command.get_commands_data()
-        help_commands_data = help_command.get_commands_data()
-        # bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
-
-        # functions not called by a command
-        spam_korniszon.spamming(driver, leaderboard)
-
-
-        # functions called with a command
-        if Command.is_any_command_found:
-            clear_chat(driver) # clear chat before exec logic, so we can still get commands which were posted during this
-
-            if binguj_commads_data:
-                for data in binguj_commads_data: # prompt returns a list of tuples with prompt and nickname
-                    binguj(driver, str(data["input"]), tabs)  # Call Binguj function with the command as an argument
-
-            # if bingus_gpt_commands_data:
-            #     for data in bingus_gpt_commands_data:
-            #         bingus_gpt(driver, data, tabs)    
-
-            if korniszon_commands_data:
-                for data in korniszon_commands_data:
-                    korniszon(driver, data, leaderboard)
-
-            if spam_commands_data:
-                for data in spam_commands_data:
-
-                    # if '-l' in data['input'] and data['user'] == 'Ing': # check for -l flag for limit and if user is admin
-                    #     input_data = data['input'].replace(' -l ','')
-                    #     SpamKorniszon.spam_limit = int(input_data)
-                    #     response = f"Limit ustawiony na {SpamKorniszon.spam_limit} szefie <faja>"
-                    #     wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
-                    # else:
-                    spam_korniszon.set_spamming_time(driver, data)
-
-            if torniszon_commands_data:
-                for data in torniszon_commands_data:
-                    best_korniszon_by_day(driver, data, leaderboard)
-
-            if ranking_commands_data:
-                for data in ranking_commands_data:
-                    # leaderboard.load_leaderboard()
-                    leaderboard.display_leaderboard(driver, data["input"])
-
-            if user_stats_data:
-                for data in user_stats_data:
-                    # leaderboard.load_leaderboard()
-                    leaderboard.display_user_stats(driver, data)
-
-            if restart_commands_data:
-                for data in restart_commands_data:
-                    wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
-                    innit_bot(driver)        
-
-            if help_commands_data:
-                for data in help_commands_data:
-                    Command.help()
+        # Only incoming messages, so the bot can ignore itself (outgoing messages)
+        incoming_messages = driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
         
-            # after we checked the chat for commands, clear it from the messages so we won't use them again.
-            Command.is_any_command_found = False
+        if incoming_messages:
+       
+            # # check chat for commands and return data of them
+            # binguj_commads_data = binguj_command.get_commands_data(incoming_messages)
+            # korniszon_commands_data =  korniszon_command.get_commands_data(incoming_messages)
+            # spam_commands_data = spam_command.get_commands_data(incoming_messages)
+            # torniszon_commands_data = topniszon_command.get_commands_data(incoming_messages)
+            # ranking_commands_data = ranking_command.get_commands_data(incoming_messages)
+            # user_stats_data = user_korniszon_stats_command.get_commands_data(incoming_messages)
+            # restart_commands_data = restart_command.get_commands_data(incoming_messages)
+            # help_commands_data = help_command.get_commands_data(incoming_messages)
+            # # bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
+
+            Command.get_commands_data(incoming_messages)
+
+            # functions not called by a command
+            spam_korniszon.spamming(driver, leaderboard)
+
+
+            # functions called with a command
+            if Command.is_any_command_found:
+
+                clear_chat(driver) # clear chat before exec logic, so we can still get commands which were posted during this
+                
+                binguj_commads_data = Command.get_commands_by_type(binguj_command)
+
+                if binguj_commads_data:
+                    for data in binguj_commads_data: # prompt returns a list of tuples with prompt and nickname
+                        binguj(driver, str(data["input"]), tabs)  # Call Binguj function with the command as an argument
+
+
+                # if bingus_gpt_commands_data:
+                #     for data in bingus_gpt_commands_data:
+                #         bingus_gpt(driver, data, tabs)
+
+                print(f"korniszon_command: {korniszon_command}")
+                korniszon_commands_data = Command.get_commands_by_type(str(korniszon_command))
+                
+                if korniszon_commands_data:
+                    for data in korniszon_commands_data:
+                        korniszon(driver, data, leaderboard)
+
+
+                spam_commands_data = Command.get_commands_by_type(str(spam_command))
+
+                if spam_commands_data:
+                    for data in spam_commands_data:
+                        spam_korniszon.set_spamming_time(driver, data)
+
+
+                topniszon_commands_data = Command.get_commands_by_type(str(topniszon_command))
+
+                if topniszon_commands_data:
+                    for data in topniszon_commands_data:
+                        best_korniszon_by_day(driver, data, leaderboard)
+
+
+                ranking_commands_data = Command.get_commands_by_type(str(ranking_command))
+
+                if ranking_commands_data:
+                    for data in ranking_commands_data:
+                        leaderboard.display_leaderboard(driver, data["input"])
+
+                user_stats_data = Command.get_commands_by_type(staty_command)
+
+                if user_stats_data:
+                    for data in user_stats_data:
+                        leaderboard.display_user_stats(driver, data)
+
+
+                restart_commands_data = Command.get_commands_by_type(str(restart_command))
+
+                if restart_commands_data:
+                    for data in restart_commands_data:
+                        wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
+                        innit_bot(driver)
+
+
+                help_commands_data = Command.get_commands_by_type(str(help_command))
+
+                if help_commands_data:
+                    for data in help_commands_data:
+                        Command.help()
+            
+                # after we checked the chat for commands, clear it from the messages so we won't use them again.
+                Command.is_any_command_found = False
 
 
     except TimeoutException:
