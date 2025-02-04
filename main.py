@@ -101,11 +101,6 @@ def __create_driver() -> webdriver.Chrome:
     return driver
 
 
-# for testing purposes, if there argument "test", start chat with me (testing). Otherwise start chat with Komfa
-
-
-
-
 # initialize bot and return tabs
 driver = __create_driver()
 tabs = innit_bot(driver)
@@ -140,24 +135,13 @@ while(True):
         incoming_messages = driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
         
         if incoming_messages:
-       
-            # # check chat for commands and return data of them
-            # binguj_commads_data = binguj_command.get_commands_data(incoming_messages)
-            # korniszon_commands_data =  korniszon_command.get_commands_data(incoming_messages)
-            # spam_commands_data = spam_command.get_commands_data(incoming_messages)
-            # torniszon_commands_data = topniszon_command.get_commands_data(incoming_messages)
-            # ranking_commands_data = ranking_command.get_commands_data(incoming_messages)
-            # user_stats_data = user_korniszon_stats_command.get_commands_data(incoming_messages)
-            # restart_commands_data = restart_command.get_commands_data(incoming_messages)
-            # help_commands_data = help_command.get_commands_data(incoming_messages)
-            # # bingus_gpt_commands_data = bingus_gpt_command.get_commands_data()
-
-            Command.get_commands_data(incoming_messages)
-
             # functions not called by a command
             spam_korniszon.spamming(driver, leaderboard)
 
 
+            Command.get_commands_data(incoming_messages)
+
+            
             # functions called with a command
             if Command.is_any_command_found:
 
@@ -202,7 +186,7 @@ while(True):
                     for data in ranking_commands_data:
                         leaderboard.display_leaderboard(driver, data["input"])
 
-                user_stats_data = Command.get_commands_by_type(staty_command)
+                user_stats_data = Command.get_commands_by_type(str(staty_command))
 
                 if user_stats_data:
                     for data in user_stats_data:

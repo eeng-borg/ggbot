@@ -97,7 +97,3 @@ class TestGetCommandData:
         id, _, _, command = command_data
         assert Command.received_commands[id]['command'] == command
 
-
-
-
-
