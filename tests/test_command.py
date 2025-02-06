@@ -77,7 +77,7 @@ class TestGetCommandData:
         (4, "ula", "", "help")
     ])
     def command_data(self, request):
-        return request.param    
+        return request.param
     
 
     def test_user(self, command_data):

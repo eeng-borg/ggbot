@@ -13,17 +13,21 @@ from utils.utilities import wait_find_input_and_send_keys, clear_chat
 from innit_bot import innit_bot
 import logging as Log
 
+
 import traceback
 from datetime import datetime
+import time
 
 
 from command_modules.binguj import binguj
 from command_modules.bingus_gpt import bingus_gpt
-from command_modules.korniszon_module.korniszon import korniszon
+from command_modules.korniszon_module.korniszon import Korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from command_modules.korniszon_module.best_korniszon_by_day import best_korniszon_by_day 
 from command_modules.korniszon_module.random_korniszon import SpamKorniszon
 from command_modules.command import Command
+
+from users import User
 
 
 
@@ -61,17 +65,18 @@ def __create_driver() -> webdriver.Chrome:
     os_type = platform.system()
 
     if os_type == "Linux":
-        chrome_options.add_argument("--headless=new")  # Run Chrome in headless mode
-        chrome_options.add_argument("--start-maximized") # so it looks more human-like
+        chrome_options.add_argument("--headless")  # Run Chrome in headless mode
+        # chrome_options.add_argument("--start-maximized") # so it looks more human-like
         chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (recommended in headless mode)
         chrome_options.add_argument("--no-sandbox")  # Disable sandboxing for headless mode (some environments need this)
-        chrome_options.add_argument("--remote-debugging-port=9222")
+        chrome_options.add_argument("--disable-dev-shm-usage") # Avoid Chrome crash by disabling shared memory
         chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Prevent detection
+        # chrome_options.add_argument("--disable-features=VizDisplayCompositor")
+        chrome_options.add_argument("--enable-logging")
+        chrome_options.add_argument("--v=1")
         chrome_options.add_argument("--window-size=800x600")  # Ensure proper rendering
-
     
-    # Avoid Chrome crash by disabling shared memory
-    chrome_options.add_argument("--disable-dev-shm-usage")
+    
 
     try:
         if os_type == "Linux":
@@ -122,9 +127,19 @@ staty_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
 restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
+
 leaderboard = Leaderboard()
+korniszon = Korniszon(driver, leaderboard)
 leaderboard.load_leaderboard()
-spam_korniszon = SpamKorniszon()
+spam_korniszon = SpamKorniszon(driver, leaderboard)
+
+
+# innit users, i don't expect a dynamic user base, so I can't innit them upfront
+users: list[User] = []
+users.append(User('Ing'))
+users.append(User('Zefir'))
+
+
 
 # main loop for bot operations
 while(True):
@@ -133,12 +148,11 @@ while(True):
     try:
         # Only incoming messages, so the bot can ignore itself (outgoing messages)
         incoming_messages = driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
+
         
         if incoming_messages:
-            # functions not called by a command
-            spam_korniszon.spamming(driver, leaderboard)
 
-
+            # search for commands in messages and return data of them
             Command.get_commands_data(incoming_messages)
 
             
@@ -163,7 +177,11 @@ while(True):
                 
                 if korniszon_commands_data:
                     for data in korniszon_commands_data:
-                        korniszon(driver, data, leaderboard)
+
+                        # look for user who made a command in users list, to check if his cooldown has ended
+                        for user in users:
+                            if user.name == data['user']:
+                                korniszon.korniszon(data, user.has_colldown_ended)
 
 
                 spam_commands_data = Command.get_commands_by_type(str(spam_command))
@@ -223,4 +241,3 @@ while(True):
         print(f"Unexpected error: {type(e).__name__}, {e}")
         driver.switch_to.window(tabs["main tab"])
         continue
-    
