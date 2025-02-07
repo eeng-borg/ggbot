@@ -124,7 +124,7 @@ spam_command = Command(driver, 'spam', "co ile sekund ma spamować korniszonami 
 topniszon_command = Command(driver, 'topniszon', "najlepszy korniszon z dziś <okularnik>")
 ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych korniszonów w kosmosie!! Podaj 1-2 numery, aby określić zakres.")
 staty_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
-restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
+# restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
 
@@ -207,19 +207,12 @@ while(True):
                         leaderboard.display_user_stats(driver, data)
 
 
-                restart_commands_data = Command.get_commands_by_type(str(restart_command))
-
-                if restart_commands_data:
-                    for data in restart_commands_data:
-                        wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Restartuje się <palacz>")
-                        innit_bot(driver)
-
-
                 help_commands_data = Command.get_commands_by_type(str(help_command))
 
                 if help_commands_data:
                     for data in help_commands_data:
                         Command.help()
+                        
             
                 # after we checked the chat for commands, clear it from the messages so we won't use them again.
                 Command.is_any_command_found = False
