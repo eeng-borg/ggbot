@@ -1,3 +1,4 @@
+import sys
 import threading
 import time
 
@@ -8,7 +9,14 @@ class UserNotFoundError(Exception):
 
 class Cooldown:
 
-    cooldown_time = 10
+    if len(sys.argv) > 1:
+        cooldown_time = int(sys.argv[1])
+        
+    else:
+        cooldown_time = 20
+
+        
+
     instances = [] # class instances
 
 

@@ -74,7 +74,7 @@ class TestCooldown:
         return driver
     
     @pytest.fixture(scope='class')
-    def mock_leaderboard(self, mock_driver):
+    def mock_leaderboard(self) -> Leaderboard:
 
         leaderboard = Leaderboard()
         return leaderboard 
@@ -102,11 +102,43 @@ class TestCooldown:
         # Return a controlled value instead of triggering a timeout.
         return  # or a list of dummy elements if needed
     
+    @staticmethod
+    def dummy_exceptions(mock_command_data: CommandData, mock_leaderboard: Leaderboard):
+
+        return
+
+        # # in case if korniszon is already on leaderborad
+        # if any(mock_command_data['input'] == entry["input"] for entry in mock_leaderboard.leaderboard):
+
+        #     pozycja = mock_leaderboard.get_position(mock_command_data['input'])
+        #     return f"{mock_command_data['input']} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
+        
+
+        # # in case there were no letters in korniszon and you were left with empty variable
+        # if len(mock_command_data['input']) == 0:
+
+        #     return "3456 punktów <zniesmaczony>. Naum się w korniszony!"
+        
+
+        # elif len(mock_command_data['input']) > 30:
+
+        #     return "Nie będę oceniał takiego długasa <nono>"
+        
+    @staticmethod
+    def dummy_cooldown_wait_responde(*args, **kwargs):
+        # time_left = cooldown.time_remaining()
+        # return f"Poczekaj {time_left} sekund, {korniszon_data['user']} <luzik>"
+        return 'Czekaj'
+
+    
 
     @pytest.fixture
     def patched_korniszon(self, monkeypatch: pytest.MonkeyPatch, mock_leaderboard, mock_driver):
 
         monkeypatch.setattr(Korniszon, 'send_results', self.dummy_send_results)
+        monkeypatch.setattr(Korniszon, 'exceptions', TestCooldown.dummy_exceptions)
+        monkeypatch.setattr(Korniszon, 'cooldown_wait_responde', TestCooldown.dummy_cooldown_wait_responde)
+
         return Korniszon(mock_driver, mock_leaderboard)
     
 

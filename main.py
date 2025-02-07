@@ -134,11 +134,6 @@ leaderboard.load_leaderboard()
 spam_korniszon = SpamKorniszon(driver, leaderboard)
 
 
-# innit users, i don't expect a dynamic user base, so I can't innit them upfront
-Cooldown('Ing')
-Cooldown('Zefir')
-
-
 
 # main loop for bot operations
 while(True):
