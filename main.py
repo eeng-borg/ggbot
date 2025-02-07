@@ -155,11 +155,11 @@ while(True):
 
                 clear_chat(driver) # clear chat before exec logic, so we can still get commands which were posted during this
                 
-                binguj_commads_data = Command.get_commands_by_type(binguj_command)
+                binguj_commads_data = Command.get_commands_by_type(str(binguj_command))
 
                 if binguj_commads_data:
-                    for data in binguj_commads_data: # prompt returns a list of tuples with prompt and nickname
-                        binguj(driver, str(data["input"]), tabs)  # Call Binguj function with the command as an argument
+                    for data in binguj_commads_data:
+                        binguj(driver, str(data["input"]), tabs)
 
 
                 # if bingus_gpt_commands_data:

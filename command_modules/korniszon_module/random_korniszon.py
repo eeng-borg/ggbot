@@ -58,7 +58,7 @@ class SpamKorniszon:
                     self.thread = threading.Thread(target = self.__spamming, daemon=True) # starts the thread on main thread
                     self.thread.start() # do not exexutes
 
-                response = f"Spam co {new_spam_time} sekund (normalnych) <w8>"
+                response = f"Spam co {new_spam_time} minut (normalnych) <w8>"
                 wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
 
 
