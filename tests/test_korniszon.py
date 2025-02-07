@@ -1,30 +1,24 @@
 import pytest
 from unittest.mock import patch
-from command_modules.korniszon_module.korniszon import Korniszon
 from selenium import webdriver
+from utils.types import CommandData
+from command_modules.korniszon_module.korniszon import Korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
+from users import Cooldown
 
 
 class SharedData:
     base_score = 10
 
 @pytest.fixture(scope="module")
-def mock_korniszon():
+def mock_korniszon() -> Korniszon:
 
     driver = webdriver.Chrome()
     leaderboard = Leaderboard()
     korniszon = Korniszon(driver, leaderboard)
+
     return korniszon
 
-
-
-        # @pytest.mark.parametrize("text, result", [
-        # ("korniszon", 10),
-        # ("kor", 6.67),
-        # ("korniszonkorniszon", 4.44),
-        # ])  
-
-    # @pytest.mark.parametrize("text", ["oooo", "oaauuiióeęą", "aie ou y"])
 
 @pytest.mark.parametrize("text, result", [
 ("oooo", 0),
@@ -39,7 +33,7 @@ def mock_korniszon():
 ("kkkkkkk", 0),
 ("fdf dfdf", 0)
 ])
-def test_vowels_percent(text, result, mock_korniszon):
+def test_vowels_percent(text, result, mock_korniszon: Korniszon):
     assert mock_korniszon.score_vowels_percent(SharedData.base_score, text) == result
 
 
@@ -54,7 +48,7 @@ def test_vowels_percent(text, result, mock_korniszon):
 ("bbbcccooo", 4.44),
 ("bbbbccdddtttt", 1.67)
 ])
-def test_repetitions(text, result, mock_korniszon):
+def test_repetitions(text, result, mock_korniszon: Korniszon):
     assert mock_korniszon.score_repetitions(SharedData.base_score, text) == result
 
 
@@ -63,9 +57,76 @@ def test_repetitions(text, result, mock_korniszon):
     ("kor", 6.67),
     ("korniszonkorniszon", 4.44),
     ])    
-def test_score_lenght(text, result, mock_korniszon):
+def test_score_lenght(text, result, mock_korniszon: Korniszon):
     with patch("random.randint", return_value = 9):  # Mock random.randint to always return 9        
         
         assert round(mock_korniszon.score_lenght(SharedData.base_score, text), 2) == result  # Replace with the expected result
         print("Test passed!")
+
+
+
+class TestCooldown:
+        
+    @pytest.fixture(scope='class')
+    def mock_driver(self):
+
+        driver = webdriver.Chrome()
+        return driver
+    
+    @pytest.fixture(scope='class')
+    def mock_leaderboard(self, mock_driver):
+
+        leaderboard = Leaderboard()
+        return leaderboard 
+
+
+    @pytest.fixture(scope='class')
+    def mock_korniszon(self, mock_driver, mock_leaderboard):
+
+        korniszon = Korniszon(mock_driver, mock_leaderboard)
+
+        Cooldown('Maciek')
+        Cooldown('Janusz')
+
+        return korniszon  
+    
+    
+    @pytest.fixture(scope='class')
+    def mock_command_data(self):
+
+        data = CommandData(user='Janusz', input='bualoa', command='korniszon', time={'day':1,'month':2,'year':2000,'hour':1,'minute':2})
+        return data
+    
+    
+    def dummy_send_results(*args, **kwargs):
+        # Return a controlled value instead of triggering a timeout.
+        return  # or a list of dummy elements if needed
+    
+
+    @pytest.fixture
+    def patched_korniszon(self, monkeypatch: pytest.MonkeyPatch, mock_leaderboard, mock_driver):
+
+        monkeypatch.setattr(Korniszon, 'send_results', self.dummy_send_results)
+        return Korniszon(mock_driver, mock_leaderboard)
+    
+
+    def test_adding(self, mock_command_data, mock_leaderboard: Leaderboard, patched_korniszon: Korniszon):
+
+        cooldown = Cooldown.find_user(mock_command_data['user'])
+        patched_korniszon.rate_korniszon(mock_command_data, cooldown)
+
+        assert len(mock_leaderboard.leaderboard) == 1
+
+
+    def test_adding_too_fast(self, mock_command_data, mock_leaderboard: Leaderboard, patched_korniszon: Korniszon):
+
+        cooldown = Cooldown.find_user(mock_command_data['user'])
+        patched_korniszon.rate_korniszon(mock_command_data, cooldown)
+        cooldown.start()
+        patched_korniszon.rate_korniszon(mock_command_data, cooldown)
+
+        assert len(mock_leaderboard.leaderboard) == 1
+
+
+
 

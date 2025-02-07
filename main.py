@@ -27,7 +27,7 @@ from command_modules.korniszon_module.best_korniszon_by_day import best_korniszo
 from command_modules.korniszon_module.random_korniszon import SpamKorniszon
 from command_modules.command import Command
 
-from users import User
+from users import Cooldown
 
 
 
@@ -135,9 +135,8 @@ spam_korniszon = SpamKorniszon(driver, leaderboard)
 
 
 # innit users, i don't expect a dynamic user base, so I can't innit them upfront
-users: list[User] = []
-users.append(User('Ing'))
-users.append(User('Zefir'))
+Cooldown('Ing')
+Cooldown('Zefir')
 
 
 
@@ -172,16 +171,17 @@ while(True):
                 #     for data in bingus_gpt_commands_data:
                 #         bingus_gpt(driver, data, tabs)
 
-                print(f"korniszon_command: {korniszon_command}")
+
+                #   ---Korniszon--- 
                 korniszon_commands_data = Command.get_commands_by_type(str(korniszon_command))
                 
                 if korniszon_commands_data:
                     for data in korniszon_commands_data:
 
-                        # look for user who made a command in users list, to check if his cooldown has ended
-                        for user in users:
-                            if user.name == data['user']:
-                                korniszon.korniszon(data, user.has_colldown_ended)
+                        # look for user who made a command in users list, to check if his cooldown has ended for him
+                        cooldown = Cooldown.find_user(data['user'])
+                        korniszon.rate_korniszon(data, cooldown)
+                        cooldown.start() # if cooldown is over and rating a korniszon is attempted, turn on the flag again.
 
 
                 spam_commands_data = Command.get_commands_by_type(str(spam_command))
@@ -203,6 +203,7 @@ while(True):
                 if ranking_commands_data:
                     for data in ranking_commands_data:
                         leaderboard.display_leaderboard(driver, data["input"])
+
 
                 user_stats_data = Command.get_commands_by_type(str(staty_command))
 

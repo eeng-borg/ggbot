@@ -12,7 +12,11 @@ from typing import Dict
 class Leaderboard:
 
     leaderboard_file_name = "leaderboard_new.json"
-    leaderboard = []
+
+    def __init__(self):
+        self.leaderboard = []
+
+
 
     def load_leaderboard(self):
 

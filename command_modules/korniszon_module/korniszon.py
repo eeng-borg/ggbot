@@ -1,11 +1,10 @@
-from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
+from utils.utilities import wait_find_input_and_send_keys
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 import random
 from utils.types import CommandData
 from command_modules.korniszon_module.leaderboard import Leaderboard
-from typing import List
-from datetime import datetime
+from users import Cooldown
 
 
 class Korniszon:
@@ -222,105 +221,117 @@ class Korniszon:
         wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 
 
-    def edge_cases(self, korniszon_input):
+    # def edge_cases(self, korniszon_input):
 
-        # if duplicates
-        # print(f"Korniszon: {korniszon_input} in {leaderboard.leaderboard}")
-        if any(korniszon_input == entry["input"] for entry in self.leaderboard.leaderboard):
+    #     # if duplicates
+    #     # print(f"Korniszon: {korniszon_input} in {leaderboard.leaderboard}")
+    #     if any(korniszon_input == entry["input"] for entry in self.leaderboard.leaderboard):
 
-            pozycja = self.leaderboard.get_position(korniszon_input)
-            response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
-            return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+    #         pozycja = self.leaderboard.get_position(korniszon_input)
+    #         response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
+    #         return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
         
-        # edge cases
-        # in case there were no letters in korniszon and you were left with empty variable
-        if len(korniszon_input) == 0:
+    #     # edge cases
+    #     # in case there were no letters in korniszon and you were left with empty variable
+    #     if len(korniszon_input) == 0:
 
-            response = f"{random.randint(-784545, -3456)} punktów <zniesmaczony>. Naum się w korniszony!"
-            return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+    #         response = f"{random.randint(-784545, -3456)} punktów <zniesmaczony>. Naum się w korniszony!"
+    #         return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
         
 
-        elif len(korniszon_input) > 30:
+    #     elif len(korniszon_input) > 30:
 
-            response = "Nie będę oceniał takiego długasa <nono>"
-            return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)    
+    #         response = "Nie będę oceniał takiego długasa <nono>"
+    #         return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)    
 
 
 
+    def cooldown_wait_responde(self, cooldown: Cooldown, korniszon_data: CommandData):
+        time_left = cooldown.time_remaining()
+        response = f"Poczekaj {time_left} sekund, {korniszon_data['user']} <luzik>"
+
+        wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+
+    
+    # def edge_cases(self):
+    #     return True
 
 
     #---------------
     # main def
-    def korniszon(self, korniszon_data: CommandData, has_cooldown_ended):
+    def rate_korniszon(self, korniszon_data: CommandData, cooldown: Cooldown):
 
-    # if has_cooldown_ended:
+        if cooldown.on_cooldown:
 
-        score = 0
-
-        # remove special chars, numbers etc, so it looks nice no matter how much user (fircyk) is trying to make it ugly ;>   
-        # do it on korniszon_data, because we later pass it to the new_korniszon function
-        korniszon_data["input"] = self.korniszon_cleanup(korniszon_data["input"])
-
-        korniszon_input = korniszon_data["input"]
-
-        # edge cases
-        # in case if korniszon is already on leaderborad
-        if any(korniszon_input == entry["input"] for entry in self.leaderboard.leaderboard):
-
-            pozycja = self.leaderboard.get_position(korniszon_input)
-            response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
-            return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+            self.cooldown_wait_responde(cooldown, korniszon_data)
+            return
         
 
-        # in case there were no letters in korniszon and you were left with empty variable
-        if len(korniszon_input) == 0:
+        if not cooldown.on_cooldown:
 
-            response = f"{random.randint(-784545, -3456)} punktów <zniesmaczony>. Naum się w korniszony!"
-            return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+            score = 0
+
+            # remove special chars, numbers etc, so it looks nice no matter how much user (fircyk) is trying to make it ugly ;>   
+            # do it on korniszon_data, because we later pass it to the new_korniszon function
+            korniszon_data["input"] = self.korniszon_cleanup(korniszon_data["input"])
+
+            korniszon_input = korniszon_data["input"]
+
+            # edge cases
+            # in case if korniszon is already on leaderborad
+            if any(korniszon_input == entry["input"] for entry in self.leaderboard.leaderboard):
+
+                pozycja = self.leaderboard.get_position(korniszon_input)
+                response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
+                return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+            
+
+            # in case there were no letters in korniszon and you were left with empty variable
+            if len(korniszon_input) == 0:
+
+                response = f"{random.randint(-784545, -3456)} punktów <zniesmaczony>. Naum się w korniszony!"
+                return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+            
+
+            elif len(korniszon_input) > 30:
+
+                response = "Nie będę oceniał takiego długasa <nono>"
+                return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+             
+
+            # check each character unicode number and then modulo them to get some random numbers, I want to make it hard to predict
+            score = self.score_characters_value(score, korniszon_input)
+            print(f"Char score: {round(score, 2)}")
+            print('---')
+
+            # check how many % of the string are vowels and then multiple the score - accoring to set rules. 
+            # I don't want korniszons to have too many or too less vowels so they still sounds like words, ~30% is an golden rule.
+            score = self.score_vowels_percent(score, korniszon_input)
+            print(f"Vowels score: {round(score, 2)}")
+            print('---')
+
+            #score repetitions
+            # check every character in a string ONCE, for how many repetitions it has and then divide the score by it
+            # i don't want too many the same letters in one word to avoid fgddfdgfgfff  
+            score = self.score_repetitions(score, korniszon_input)
+            print(f"Reps score: {round(score, 2)}")
+            print('---')
+
+            # to avoid too short or too long words, the bigger diffrence from the ideal lenght the worse score
+            score = self.score_lenght(score, korniszon_input)
+            print(f"Len score: {round(score, 2)}")
+            print('---')
+
+
+            # add new position to leaderboard, do it after calculating score
+            self.leaderboard.add_korniszon(korniszon_data, score)
+
+            # send the message on gg how much point your korniszon earned and what position it has on leaderbord
+            position = self.leaderboard.get_position(korniszon_input)
+
+
+            self.send_results(score, korniszon_input, position)
+            print(f"Full score: {round(score, 2)}")
+
         
-
-        elif len(korniszon_input) > 30:
-
-            response = "Nie będę oceniał takiego długasa <nono>"
-            return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)   
-
-        # check each character unicode number and then modulo them to get some random numbers, I want to make it hard to predict
-        score = self.score_characters_value(score, korniszon_input)
-        print(f"Char score: {round(score, 2)}")
-        print('---')
-
-        # check how many % of the string are vowels and then multiple the score - accoring to set rules. 
-        # I don't want korniszons to have too many or too less vowels so they still sounds like words, ~30% is an golden rule.
-        score = self.score_vowels_percent(score, korniszon_input)
-        print(f"Vowels score: {round(score, 2)}")
-        print('---')
-
-        #score repetitions
-        # check every character in a string ONCE, for how many repetitions it has and then divide the score by it
-        # i don't want too many the same letters in one word to avoid fgddfdgfgfff  
-        score = self.score_repetitions(score, korniszon_input)
-        print(f"Reps score: {round(score, 2)}")
-        print('---')
-
-        # to avoid too short or too long words, the bigger diffrence from the ideal lenght the worse score
-        score = self.score_lenght(score, korniszon_input)
-        print(f"Len score: {round(score, 2)}")
-        print('---')
-
-
-        # add new position to leaderboard, do it after calculating score
-        self.leaderboard.add_korniszon(korniszon_data, score)
-
-
-        # send the message on gg how much point your korniszon earned and what position it has on leaderbord
-        position = self.leaderboard.get_position(korniszon_input)
-
-
-        self.send_results(score, korniszon_input, position)
-        print(f"Full score: {round(score, 2)}")
-
-        has_cooldown_ended = False
-
-
-        # return has_cooldown_ended
 

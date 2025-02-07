@@ -122,7 +122,7 @@ class Command:
                     print(command_data)
 
                     Command.received_commands.append(command_data)
-                    print(f"Lista: {Command.received_commands}")
+                    # print(f"Lista: {Command.received_commands}")
 
                     break # if command is found in this message, theres not point of checking for others, 
                             # so we skip to the next message
