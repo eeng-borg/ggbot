@@ -65,8 +65,7 @@ def __create_driver() -> webdriver.Chrome:
     os_type = platform.system()
 
 
-    if 'headless' in sys.argv:
-    # if os_type == "Linux":
+    if os_type == "Linux":
 
         chrome_options.add_argument("--headless")  # Run Chrome in headless mode
         # chrome_options.add_argument("--start-maximized") # so it looks more human-like
@@ -80,22 +79,17 @@ def __create_driver() -> webdriver.Chrome:
         chrome_options.add_argument("--window-size=800x600")  # Ensure proper rendering
     
     
+
     try:
         if os_type == "Linux":
             print("Running on Linux server")
-            service = Service("/usr/local/bin/chromedriver")            
+            service = Service("/usr/local/bin/chromedriver")
+            user_data_dir = os.getenv('PROD_PROFILE') # production
 
         elif os_type == "Windows":
             print("Running on Windows local")
             service = Service("./chromedriver.exe") #change to exe for windows
-
-
-        if 'prod' in sys.argv:
-            user_data_dir = os.getenv('PROD_PROFILE') # production
-
-        else:
             user_data_dir = os.getenv('DEV_PROFILE') # development
-
 
         
         # Use a different user data directory for each instance
@@ -103,7 +97,7 @@ def __create_driver() -> webdriver.Chrome:
         chrome_options.add_argument(f"--user-data-dir={profile_path}")
         chrome_options.add_argument(f"--profile-directory={user_data_dir}")  # Default profile directory
 
-
+        
         # create a driver
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
