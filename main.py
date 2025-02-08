@@ -80,7 +80,7 @@ def __create_driver() -> webdriver.Chrome:
         chrome_options.add_argument("--window-size=800x600")  # Ensure proper rendering
     
     
-
+    try:
         if os_type == "Linux":
             print("Running on Linux server")
             service = Service("/usr/local/bin/chromedriver")            
@@ -103,7 +103,7 @@ def __create_driver() -> webdriver.Chrome:
         chrome_options.add_argument(f"--user-data-dir={profile_path}")
         chrome_options.add_argument(f"--profile-directory={user_data_dir}")  # Default profile directory
 
-    try:
+
         # create a driver
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
