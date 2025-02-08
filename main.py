@@ -64,7 +64,10 @@ def __create_driver() -> webdriver.Chrome:
     # if hasattr(sys, "_MEIPASS"):
     os_type = platform.system()
 
-    if os_type == "Linux":
+
+    if 'headless' in sys.argv:
+    # if os_type == "Linux":
+
         chrome_options.add_argument("--headless")  # Run Chrome in headless mode
         # chrome_options.add_argument("--start-maximized") # so it looks more human-like
         chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (recommended in headless mode)
@@ -78,16 +81,21 @@ def __create_driver() -> webdriver.Chrome:
     
     
 
-    try:
         if os_type == "Linux":
             print("Running on Linux server")
-            service = Service("/usr/local/bin/chromedriver")
-            user_data_dir = os.getenv('PROD_PROFILE') # production
+            service = Service("/usr/local/bin/chromedriver")            
 
         elif os_type == "Windows":
             print("Running on Windows local")
             service = Service("./chromedriver.exe") #change to exe for windows
+
+
+        if 'prod' in sys.argv:
+            user_data_dir = os.getenv('PROD_PROFILE') # production
+
+        else:
             user_data_dir = os.getenv('DEV_PROFILE') # development
+
 
         
         # Use a different user data directory for each instance
@@ -95,7 +103,7 @@ def __create_driver() -> webdriver.Chrome:
         chrome_options.add_argument(f"--user-data-dir={profile_path}")
         chrome_options.add_argument(f"--profile-directory={user_data_dir}")  # Default profile directory
 
-        
+    try:
         # create a driver
         driver = webdriver.Chrome(service=service, options=chrome_options)
 

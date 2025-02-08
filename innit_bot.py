@@ -5,6 +5,7 @@ from typing import Dict
 import time
 import platform
 import os
+import sys
 
 
 def __set_gpt_charcter(driver: webdriver.Chrome, gpt_tab: str):
@@ -16,17 +17,18 @@ def __set_gpt_charcter(driver: webdriver.Chrome, gpt_tab: str):
     wait_find_input_and_send_keys(driver, 1, By.XPATH, xpathSend, characterFaja)
 
 
-def __open_chat(driver: webdriver.Chrome, os_type = 'Linux'):
+def __open_chat(driver: webdriver.Chrome):
     
     os_type = platform.system()
 
     # prod
-    if os_type == "Linux":
+    if 'prod' in sys.argv:
         chat = 'Komfa'
 
     # dev
-    elif os_type == "Windows":
+    else:
         chat = os.getenv('TEST_CHAT')
+
 
     wait_find_and_click(driver, 1, By.XPATH, f"//*[text()='{chat}']") # click on profile and start chat, avoid stale element exception
     wait_find_and_click(driver, 1, By.CLASS_NAME, "talk-button")  # click on talk button to start chat

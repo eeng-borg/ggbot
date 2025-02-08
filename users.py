@@ -9,11 +9,11 @@ class UserNotFoundError(Exception):
 
 class Cooldown:
 
-    if len(sys.argv) > 1:
-        cooldown_time = int(sys.argv[1])
+    # if len(sys.argv) > 1 and :
+    #     cooldown_time = int(sys.argv[1])
         
-    else:
-        cooldown_time = 20
+    # else:
+    cooldown_time = 20
 
         
 
