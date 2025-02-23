@@ -52,7 +52,7 @@ class TestGetCommandData:
         Command(driver, "korniszon", "This is a test command")
         Command(driver, "help", "dfdfffdf")
 
-        driver.get("file:///C:/Users/gordi/OneDrive/Dokumenty/Python_projects/ggbot/tests/incoming_messages_html/messages.html")
+        driver.get("file:///F:/skrypty/Python_projects/ggbot/tests/incoming_messages_html/messages.html")
         incoming_messages = driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
         Command.get_commands_data(incoming_messages)
 
@@ -60,13 +60,17 @@ class TestGetCommandData:
         driver.quit()
 
 
+
     def test_counting_all(self, get_elements):
         assert len(get_elements) == 6
+
 
 
     def test_counting_commands(self):
 
         assert len(Command.received_commands) == 5
+
+
 
     # shared params for multiple tests
     @pytest.fixture(params=[

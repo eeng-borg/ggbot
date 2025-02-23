@@ -33,6 +33,7 @@ def __open_chat(driver: webdriver.Chrome, os_type = 'Linux'):
     # clear_chat(driver) # too many messages can couse problems
 
 
+
 def innit_bot(driver: webdriver.Chrome) -> Dict[str,str]:
 
     print("Bot innitated")

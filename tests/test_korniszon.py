@@ -14,7 +14,7 @@ class SharedData:
 def mock_korniszon() -> Korniszon:
 
     driver = webdriver.Chrome()
-    leaderboard = Leaderboard()
+    leaderboard = Leaderboard(driver)
     korniszon = Korniszon(driver, leaderboard)
 
     return korniszon

@@ -178,7 +178,7 @@ class Korniszon:
     #     return czas
 
 
-    def send_results(self, score, korniszon_input, position):
+    def _send_results(self, score, korniszon_input, position):
 
         # special message if korniszon get top place
         if position == 1:
@@ -252,6 +252,8 @@ class Korniszon:
 
         wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 
+
+
     
     def exceptions(self, korniszon_input):
 
@@ -283,7 +285,7 @@ class Korniszon:
 
     #---------------
     # main def
-    def rate_korniszon(self, korniszon_data: CommandData, cooldown: Cooldown):
+    def rate_korniszon(self, korniszon_data: CommandData, cooldown: Cooldown, send_results = None):
 
         if cooldown.on_cooldown:
             
@@ -334,7 +336,12 @@ class Korniszon:
             position = self.leaderboard.get_position(korniszon_input)
 
 
-            self.send_results(score, korniszon_input, position)
+            if send_results is None:
+                self._send_results(score, korniszon_input, position)
+                
+            elif send_results:
+                send_results(score, korniszon_input, position)
+                
             print(f"Full score: {round(score, 2)}")
 
         

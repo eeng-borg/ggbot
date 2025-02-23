@@ -3,24 +3,21 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import sys
-import io
 import os
 import platform
+import threading
 from dotenv import load_dotenv, find_dotenv
-import asyncio
 from selenium.common.exceptions import TimeoutException
 from utils.utilities import wait_find_input_and_send_keys, clear_chat
 from innit_bot import innit_bot
-import logging as Log
 
 
 import traceback
 from datetime import datetime
-import time
 
 
 from command_modules.binguj import binguj
-from command_modules.bingus_gpt import bingus_gpt
+# from command_modules.bingus_gpt import bingus_gpt
 from command_modules.korniszon_module.korniszon import Korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from command_modules.korniszon_module.best_korniszon_by_day import best_korniszon_by_day 
@@ -130,7 +127,7 @@ staty_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
 
-leaderboard = Leaderboard()
+leaderboard = Leaderboard(driver)
 korniszon = Korniszon(driver, leaderboard)
 leaderboard.load_leaderboard()
 spam_korniszon = SpamKorniszon(driver, leaderboard)
@@ -198,15 +195,19 @@ while(True):
                 ranking_commands_data = Command.get_commands_by_type(str(ranking_command))
 
                 if ranking_commands_data:
-                    for data in ranking_commands_data:
-                        leaderboard.display_leaderboard(driver, data["input"])
+                    data = ranking_commands_data[0]
+
+                    # leaderboard.display_leaderboard(data["input"])
+                    t2 = threading.Thread(target=leaderboard.display_leaderboard, args=(data["input"],), daemon=True)
+                    t2.start()
+                    
 
 
                 user_stats_data = Command.get_commands_by_type(str(staty_command))
 
                 if user_stats_data:
                     for data in user_stats_data:
-                        leaderboard.display_user_stats(driver, data)
+                        leaderboard.display_user_stats(data)
 
 
                 help_commands_data = Command.get_commands_by_type(str(help_command))
@@ -226,7 +227,7 @@ while(True):
 
         driver.switch_to.window(tabs["main tab"])
         wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Coś sie nie udało ;(")
-        continue    
+        continue
 
     except Exception as e:
         print(f"Unexpected error: {type(e).__name__}, {e}")
