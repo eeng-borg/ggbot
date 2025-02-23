@@ -1,8 +1,10 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from command_modules.korniszon_module.leaderboard import Leaderboard
 
 
 app = Flask(__name__)
+CORS(app)
 
 leaderboard_obj = Leaderboard()
 leaderboard_obj.load_leaderboard()
