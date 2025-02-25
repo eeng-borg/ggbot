@@ -124,6 +124,7 @@ topniszon_command = Command(driver, 'topniszon', "najlepszy korniszon z dziś <o
 ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych korniszonów w kosmosie!! Podaj 1-2 numery, aby określić zakres.")
 staty_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
 # restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
+strona_command = Command(driver, 'strona', "gg platforma z różnymi ciekawymi rzeczami <chatownik>")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
 
@@ -210,6 +211,15 @@ while(True):
                         leaderboard.display_user_stats(data)
 
 
+
+                strona_data = Command.get_commands_by_type(str(strona_command))
+
+                if strona_data:
+                    response = f"https://www.garneck.pl"
+                    wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
+
+
+
                 help_commands_data = Command.get_commands_by_type(str(help_command))
 
                 if help_commands_data:
@@ -228,6 +238,7 @@ while(True):
         driver.switch_to.window(tabs["main tab"])
         wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", "Coś sie nie udało ;(")
         continue
+    
 
     except Exception as e:
         print(f"Unexpected error: {type(e).__name__}, {e}")

@@ -4,6 +4,7 @@ from utils.types import CommandData
 from datetime import datetime
 from selenium import webdriver
 from typing import List
+import time
 from selenium.webdriver.remote.webelement import WebElement
 
 
@@ -69,16 +70,17 @@ class Command:
         command_data["user"] = user_nickname
         command_data["command"] = command_name
         command_data["input"] = input
+        command_data['timestamp'] = int(time.time())
 
-        time = {}
+        time_data = {}
 
-        time["hour"] = datetime.now().hour
-        time["minute"] = datetime.now().minute
-        time["day"] = datetime.now().day
-        time["month"] = datetime.now().month
-        time["year"] = datetime.now().year
+        time_data["hour"] = datetime.now().hour
+        time_data["minute"] = datetime.now().minute
+        time_data["day"] = datetime.now().day
+        time_data["month"] = datetime.now().month
+        time_data["year"] = datetime.now().year
 
-        command_data["time"] = time
+        command_data["time"] = time_data
 
         return command_data
     

@@ -7,15 +7,16 @@ app = Flask(__name__)
 CORS(app)
 
 leaderboard_obj = Leaderboard()
-leaderboard_obj.load_leaderboard()
-leaderboard_list = leaderboard_obj.leaderboard
 # print(leaderboard_list)
 
 
 @app.route('/ranking', methods=['GET'])
 def get_ranking():
+    leaderboard_obj.load_leaderboard()
+    leaderboard_list = leaderboard_obj.leaderboard
     return jsonify(leaderboard_list)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(host='127.0.0.1', port=8000)
+
