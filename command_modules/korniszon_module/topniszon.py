@@ -10,17 +10,18 @@ from typing import Optional
 class Topniszon:
 
 
-    def __init__(self, driver: Optional[webdriver.Chrome] = None):
+    def __init__(self, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
         self.driver = driver
         self.day_input = None
+        self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
 
 
 
-    def _input_to_when(self, input, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+    def _input_to_when(self, input, datetime_now=datetime.now()):
 
         try:
             if input == '':
-                self.day_input = datetime.now().day
+                self.day_input = datetime_now.day
                 return 'dziś'
 
             else:
@@ -29,7 +30,7 @@ class Topniszon:
         
         except ValueError:
             response = "Niepoprawny format <okok>, wprowadź pojedyńcze liczbę z jakiego dnia tego miesiąca chciałbyś topniszona, np /topniszon 5."
-            wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+            self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
 
             # for tests mainly
             return response
@@ -37,41 +38,50 @@ class Topniszon:
 
 
 
-    def best_korniszon_by_day(self, data: CommandData, leaderboard: Leaderboard, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+    def best_korniszon_by_day(self, input, leaderboard: Leaderboard, best=True, datetime_now=datetime.now()):
 
-        input = data.get('input')
         self.day_input = input
-
         when = ''
 
 
         # check if input is a number, otherwise throw exception message
-        when = self._input_to_when(input)
+        when = self._input_to_when(input, datetime_now)
+        print(f"Day: {self.day_input}")
+
 
         # so return is always a string
-        response = ''
-        
-        for korniszon in reversed(leaderboard.leaderboard):
+        # response = ''
+        # _leaderboard = leaderboard.leaderboard
+
+        # if best is False:
+
+
+
+
+        for korniszon in leaderboard.leaderboard:
 
             # if input is empty, then lets assume that user wants the best one from today
             # if day_input == '':
 
-            if korniszon['time'] != None:
-                if korniszon['time']['day'] == self.day_input and korniszon['time']['month'] == datetime.now().month and korniszon['time']['year'] == datetime.now().year:
+            if korniszon['timestamp'] != None:
+                
+                # convert timestamp to datetime object for better handling
+                timestamp = korniszon['timestamp']
+                korniszon_datetime = datetime.fromtimestamp(timestamp)
 
-                            position = korniszon.get('position')
-                            input = korniszon.get('input')
-                            score = korniszon.get('score')
-                            user = korniszon.get('user')
+                if korniszon_datetime.day == self.day_input and korniszon_datetime.month == datetime_now.month and korniszon_datetime.year == datetime_now.year:
 
-                            time = korniszon.get('time')
-                            hour = time.get('hour')
-                            minute = time.get('minute')
+                    position = korniszon.get('position')
+                    input = korniszon.get('input')
+                    score = korniszon.get('score')
+                    user = korniszon.get('user')
+
+                    hour = korniszon_datetime.hour
+                    minute = korniszon_datetime.minute
+
+                    response = (f"Najlepszy {when} <paker>\n"
+                    f"{position}. {input} - {score} ({user}) o {hour}:{minute:02d}")
 
 
-
-                            response = f"Najlepszy {when} <paker>\n"
-                            response += f"{position}. {input} - {score} ({user}) o {hour}:{minute:02d}"
-
-
-        return wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+                    self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+                    return response

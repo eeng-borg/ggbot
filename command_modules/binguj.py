@@ -4,12 +4,13 @@ from selenium.webdriver.common.by import By
 import time
 from typing import Dict
 
+
 def generate_image(driver: webdriver.Chrome, commandText: str, tabs: Dict[str,str]):
     # switch to bing tab
     driver.switch_to.window(tabs["bing tab"]) # switch to bing tab    
 
     # wait until bing ai searchbox has loaded and look for it to send a prompt
-    wait_find_input_and_send_keys(driver, 1, By.CLASS_NAME, "b_searchbox", commandText)     
+    wait_find_input_and_send_keys(driver, 1, By.CLASS_NAME, "b_searchbox", commandText)
     wait_find_and_click(driver, 10, By.CLASS_NAME, "imgri-container") # click on generated image to open Iframe
     print("Image generated")
 

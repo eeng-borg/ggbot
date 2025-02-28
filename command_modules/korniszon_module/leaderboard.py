@@ -16,10 +16,11 @@ class Leaderboard:
 
     leaderboard_file_name = "leaderboard_new.json"
 
-    def __init__(self, driver: Optional[webdriver.Chrome] = None):
+    def __init__(self, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
         self.leaderboard = []
         self.driver = driver
         self.leaderboard_is_displayed = False
+        self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
 
 
     def load_leaderboard(self):
@@ -134,15 +135,17 @@ class Leaderboard:
     
 
 
-    def _check_if_range_is_too_big(self, from_index, to_index, max_range=30, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+    def _check_if_range_is_too_big(self, from_index, to_index, max_range=30):
         
+
+
         index_range = to_index - from_index # 120 - 30 = 90
         print(f"Kalkuluj: {index_range} = {to_index} - {from_index}")
 
         if index_range > max_range:
 
             response = f"Hola komboju <luzik> {index_range} nie dostaniesz, masz 30."
-            wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+            self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
             time.sleep(1)
             print(f"to_index: {to_index}")
 
@@ -154,8 +157,9 @@ class Leaderboard:
 
 
 
-    def display_leaderboard(self, data_input, get_range_from_input=_get_range_from_input, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+    def display_leaderboard(self, data_input, get_range_from_input=_get_range_from_input):
         
+
         if self.leaderboard_is_displayed == False:
             self.leaderboard_is_displayed = True
 
@@ -192,12 +196,12 @@ class Leaderboard:
 
                     responses.append(response) # for testing
 
-                    wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+                    self.wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 
 
             else:
                 response = "Nic tu nie ma, zrób najpierw jakieś korniszony może :)"
-                wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+                self.wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 
 
             self.leaderboard_is_displayed = False
@@ -206,7 +210,7 @@ class Leaderboard:
         
         else:
             response = "Poczekaj aż pokażę całą listę <luzik>"
-            wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+            self.wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 
             return []
         

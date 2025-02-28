@@ -191,7 +191,7 @@ while(True):
 
                 if topniszon_commands_data:
                     for data in topniszon_commands_data:
-                        topniszon.best_korniszon_by_day(data, leaderboard)
+                        topniszon.best_korniszon_by_day(data.get('input'), leaderboard)
 
 
                 ranking_commands_data = Command.get_commands_by_type(str(ranking_command))

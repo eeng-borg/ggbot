@@ -17,13 +17,11 @@ def wait_find_and_click(context, waitTime, by, elementName):
     # Locate and click the element
     element = context.find_element(by, elementName)
     element.click()
-            # return  # Exit the function if successful
-    #     except StaleElementReferenceException:
-    #         print(f"Attempt {attempt + 1}: Element became stale, retrying...")
-    #         continue  # Retry by re-locating the element
-    # # If all attempts fail, raise an exception
-    # raise Exception(f"Could not interact with the element {elementName} after 3 attempts.")
+
+    
+    return element
         
+
 
 # wait until input bar has loaded, look for it and send text with ENTER
 def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText):
@@ -39,6 +37,7 @@ def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText)
     element.send_keys(inputText + Keys.ENTER)
 
 
+
 async def async_wait_find_input_send_keys(context, waitTime, by, elementName, inputText):
     # for attempt in range(3):  # Retry up to 3 times
     #     try:
@@ -51,15 +50,6 @@ async def async_wait_find_input_send_keys(context, waitTime, by, elementName, in
     element.clear()
     element.send_keys(inputText + Keys.ENTER)
     
-
-
-    #         return  # Exit the function if successful
-    #     except StaleElementReferenceException:
-    #         # Log a message or retry finding the element
-    #         print(f"Attempt {attempt + 1}: Element became stale, retrying...")
-    #         continue
-    # # If all attempts fail, raise the exception
-    # raise Exception(f"Could not interact with the element {elementName} after 3 attempts.")
 
 
 # find element by type and return it

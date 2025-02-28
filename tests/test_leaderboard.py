@@ -5,26 +5,6 @@ from command_modules.korniszon_module.korniszon import Korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from users import Cooldown
 
-# class TestGetUserStats:
-
-#     @pytest.mark.parametrize(["user", "result"], [
-#         ("", 0),
-#         ("Aku", 4),
-#         ("Garond", 3),
-#         ("Bombel", 0)
-#         ])
-#     def test_score_sum(self, user, result):
-#         assert leaderboard.leaderboard__get_user_korniszons(user, 1) == result
-
-    # @pytest.mark.parametrize("text", ["oooo", "oaauuiióeęą", "aie ou y"])
-    # def test_100_percent(self, text):
-    #     assert score_vowels_percent(SharedData.base_score, text) == 0
-
-#     # @pytest.mark.parametrize("text", ["oooo", "oaauuiióeęą", "aie ou y"])
-#     # def test_100_percent(self, text):
-#     #     assert score_vowels_percent(SharedData.base_score, text) == 0
-
-
 
 @pytest.fixture(scope = 'class')
 def mock_driver():
@@ -32,12 +12,13 @@ def mock_driver():
     driver = webdriver.Chrome()
     return driver
 
-
+def dummy_wait_find_input_and_send_keys(*args, **kwargs):
+    return
 
 @pytest.fixture
 def mock_leaderboard(mock_driver):
 
-    leaderboard = Leaderboard(mock_driver)
+    leaderboard = Leaderboard(mock_driver, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
     return leaderboard
 
 
@@ -48,12 +29,6 @@ def mock_korniszon(mock_driver, mock_leaderboard):
     korniszon = Korniszon(mock_driver, mock_leaderboard)
 
     return korniszon
-
-
-
-
-def dummy_wait_find_input_and_send_keys(*args, **kwargs):
-    return
 
 
 
@@ -116,527 +91,366 @@ def test_get_range_from_input(input, result):
 def mock_leaderboard_list():
     return [
     {
+        "user": "Zefir",
+        "input": "mavlah",
+        "time": "24.02.2025 13:48",
+        "score": 742.24,
+        "position": 1,
+        "timestamp": 1740401280
+    },
+    {
         "user": "Marcin",
         "input": "gurbak",
-        "time": {
-            "hour": 12,
-            "minute": 10,
-            "day": 5,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "05.02.2025 12:10",
         "score": 724.48,
-        "position": 1
+        "position": 2,
+        "timestamp": 1738753800
     },
     {
         "user": "Zefir",
         "input": "d\u0142ugas",
-        "time": {
-            "hour": 23,
-            "minute": 8,
-            "day": 4,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "04.02.2025 23:08",
         "score": 706.96,
-        "position": 2
+        "position": 3,
+        "timestamp": 1738706880
     },
     {
         "user": "Tadeusz",
         "input": "vigvan",
-        "time": {
-            "hour": 18,
-            "minute": 12,
-            "day": 6,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "06.02.2025 18:12",
         "score": 706.96,
-        "position": 3
+        "position": 4,
+        "timestamp": 1738861920
     },
     {
         "user": "Marcin",
         "input": "waturn",
-        "time": {
-            "hour": 14,
-            "minute": 16,
-            "day": 3,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "03.02.2025 14:16",
         "score": 698.32,
-        "position": 4
+        "position": 5,
+        "timestamp": 1738588560
     },
     {
         "user": "Marcin",
         "input": "falter",
-        "time": {
-            "hour": 0,
-            "minute": 12,
-            "day": 31,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "31.01.2025 00:12",
         "score": 696.8,
-        "position": 5
+        "position": 6,
+        "timestamp": 1738278720
     },
     {
         "user": "Marcin",
         "input": "mator",
-        "time": {
-            "hour": 11,
-            "minute": 38,
-            "day": 5,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "05.02.2025 11:38",
         "score": 694.68,
-        "position": 6
+        "position": 7,
+        "timestamp": 1738751880
     },
     {
         "user": "Tadeusz",
         "input": "halvor",
-        "time": {
-            "hour": 21,
-            "minute": 26,
-            "day": 25,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "25.01.2025 21:26",
         "score": 677.6,
-        "position": 7
+        "position": 8,
+        "timestamp": 1737836760
     },
     {
         "user": "Zefir",
         "input": "gulgot",
-        "time": {
-            "hour": 21,
-            "minute": 42,
-            "day": 17,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "17.02.2025 21:42",
         "score": 676.16,
-        "position": 8
+        "position": 9,
+        "timestamp": 1739824920
     },
     {
         "user": "Ing",
         "input": "jalong",
-        "time": {
-            "hour": 0,
-            "minute": 49,
-            "day": 4,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "04.02.2025 00:49",
         "score": 675.44,
-        "position": 9
+        "position": 10,
+        "timestamp": 1738626540
     },
     {
         "user": "Ing",
         "input": "hagen",
-        "time": {
-            "hour": 14,
-            "minute": 27,
-            "day": 19,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "19.01.2025 14:27",
         "score": 670.88,
-        "position": 10
+        "position": 11,
+        "timestamp": 1737293220
     },
     {
         "user": "Marcin",
         "input": "brudas",
-        "time": {
-            "hour": 17,
-            "minute": 32,
-            "day": 2,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "02.02.2025 17:32",
         "score": 660.72,
-        "position": 11
+        "position": 12,
+        "timestamp": 1738513920
     },
     {
         "user": "Marcin",
         "input": "laptul",
-        "time": {
-            "hour": 16,
-            "minute": 1,
-            "day": 29,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "29.01.2025 16:01",
         "score": 649.76,
-        "position": 12
+        "position": 13,
+        "timestamp": 1738162860
     },
     {
         "user": "Marcin",
         "input": "widwan",
-        "time": {
-            "hour": 23,
-            "minute": 39,
-            "day": 4,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "04.02.2025 23:39",
         "score": 647.76,
-        "position": 13
+        "position": 14,
+        "timestamp": 1738708740
     },
     {
         "user": "Marcin",
         "input": "kurzegatg",
-        "time": {
-            "hour": 13,
-            "minute": 27,
-            "day": 4,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "04.02.2025 13:27",
         "score": 644.88,
-        "position": 14
+        "position": 15,
+        "timestamp": 1738672020
+    },
+    {
+        "user": "Tadeusz",
+        "input": "bilbad",
+        "time": "23.02.2025 18:58",
+        "score": 639.84,
+        "position": 16,
+        "timestamp": 1740333480
     },
     {
         "user": "Garett",
         "input": "ingus",
-        "time": {
-            "hour": 22,
-            "minute": 46,
-            "day": 27,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "27.01.2025 22:46",
         "score": 638.4,
-        "position": 15
+        "position": 17,
+        "timestamp": 1738014360
     },
     {
         "user": "Tadeusz",
         "input": "garga",
-        "time": {
-            "hour": 22,
-            "minute": 35,
-            "day": 19,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "19.01.2025 22:35",
         "score": 630.32,
-        "position": 16
+        "position": 18,
+        "timestamp": 1737322500
     },
     {
         "user": "Marcin",
         "input": "halkord",
-        "time": {
-            "hour": 13,
-            "minute": 46,
-            "day": 6,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "06.02.2025 13:46",
         "score": 626.2,
-        "position": 17
+        "position": 19,
+        "timestamp": 1738845960
     },
     {
         "user": "Marcin",
         "input": "mechazord",
-        "time": {
-            "hour": 23,
-            "minute": 21,
-            "day": 4,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "04.02.2025 23:21",
         "score": 625.12,
-        "position": 18
+        "position": 20,
+        "timestamp": 1738707660
     },
     {
         "user": "Marcin",
         "input": "kwakut",
-        "time": {
-            "hour": 19,
-            "minute": 7,
-            "day": 2,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "02.02.2025 19:07",
         "score": 621.12,
-        "position": 19
+        "position": 21,
+        "timestamp": 1738519620
+    },
+    {
+        "user": "Marcin",
+        "input": "boralt",
+        "time": "19.02.2025 21:51",
+        "score": 620.56,
+        "position": 22,
+        "timestamp": 1739998260
     },
     {
         "user": "Marcin",
         "input": "uwkar",
-        "time": {
-            "hour": 18,
-            "minute": 45,
-            "day": 1,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "01.02.2025 18:45",
         "score": 617.84,
-        "position": 20
+        "position": 23,
+        "timestamp": 1738431900
     },
     {
         "user": "Marcin",
         "input": "garnel",
-        "time": {
-            "hour": 0,
-            "minute": 4,
-            "day": 28,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "28.01.2025 00:04",
         "score": 615.04,
-        "position": 21
+        "position": 24,
+        "timestamp": 1738019040
+    },
+    {
+        "user": "Tadeusz",
+        "input": "guffer",
+        "time": "21.02.2025 17:55",
+        "score": 613.12,
+        "position": 25,
+        "timestamp": 1740156900
+    },
+    {
+        "user": "Tadeusz",
+        "input": "warkon",
+        "time": "21.02.2025 18:35",
+        "score": 612.48,
+        "position": 26,
+        "timestamp": 1740159300
     },
     {
         "user": "Marcin",
         "input": "wilkus",
-        "time": {
-            "hour": 0,
-            "minute": 10,
-            "day": 31,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "31.01.2025 00:10",
         "score": 611.28,
-        "position": 22
+        "position": 27,
+        "timestamp": 1738278600
     },
     {
         "user": "Marcin",
         "input": "burkar",
-        "time": {
-            "hour": 18,
-            "minute": 46,
-            "day": 1,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "01.02.2025 18:46",
         "score": 607.76,
-        "position": 23
+        "position": 28,
+        "timestamp": 1738431960
     },
     {
         "user": "Tadeusz",
         "input": "bartok",
-        "time": {
-            "hour": 21,
-            "minute": 26,
-            "day": 25,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "25.01.2025 21:26",
         "score": 599.84,
-        "position": 24
+        "position": 29,
+        "timestamp": 1737836760
     },
     {
         "user": "Marcin",
         "input": "ingpal",
-        "time": {
-            "hour": 19,
-            "minute": 51,
-            "day": 27,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "27.01.2025 19:51",
         "score": 599.68,
-        "position": 25
+        "position": 30,
+        "timestamp": 1738003860
     },
     {
         "user": "Marcin",
         "input": "karafka",
-        "time": {
-            "hour": 15,
-            "minute": 6,
-            "day": 19,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "19.01.2025 15:06",
         "score": 599.12,
-        "position": 26
+        "position": 31,
+        "timestamp": 1737295560
     },
     {
         "user": "Tadeusz",
         "input": "matusz",
-        "time": {
-            "hour": 21,
-            "minute": 13,
-            "day": 25,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "25.01.2025 21:13",
         "score": 596.72,
-        "position": 27
+        "position": 32,
+        "timestamp": 1737835980
     },
     {
         "user": "Zefir",
         "input": "webber",
-        "time": {
-            "hour": 23,
-            "minute": 20,
-            "day": 17,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "17.02.2025 23:20",
         "score": 594.16,
-        "position": 28
+        "position": 33,
+        "timestamp": 1739830800
     },
     {
         "user": "Marcin",
         "input": "setkve",
-        "time": {
-            "hour": 18,
-            "minute": 41,
-            "day": 1,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "01.02.2025 18:41",
         "score": 589.92,
-        "position": 29
+        "position": 34,
+        "timestamp": 1738431660
     },
     {
         "user": "Ing",
         "input": "hutnik",
-        "time": {
-            "hour": 18,
-            "minute": 10,
-            "day": 15,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "15.02.2025 18:10",
         "score": 589.44,
-        "position": 30
+        "position": 35,
+        "timestamp": 1739639400
     },
     {
         "user": "Marcin",
         "input": "kwikon",
-        "time": {
-            "hour": 23,
-            "minute": 50,
-            "day": 27,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "27.01.2025 23:50",
         "score": 589.04,
-        "position": 31
+        "position": 36,
+        "timestamp": 1738018200
     },
     {
         "user": "Marcin",
         "input": "xurwa",
-        "time": {
-            "hour": 18,
-            "minute": 54,
-            "day": 29,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "29.01.2025 18:54",
         "score": 585.6,
-        "position": 32
+        "position": 37,
+        "timestamp": 1738173240
     },
     {
         "user": "Marcin",
         "input": "lubart",
-        "time": {
-            "hour": 19,
-            "minute": 4,
-            "day": 4,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "04.02.2025 19:04",
         "score": 584.8,
-        "position": 33
+        "position": 38,
+        "timestamp": 1738692240
+    },
+    {
+        "user": "Ing",
+        "input": "golgos",
+        "time": "21.02.2025 18:48",
+        "score": 583.68,
+        "position": 39,
+        "timestamp": 1740160080
     },
     {
         "user": "Marcin",
         "input": "istrak",
-        "time": {
-            "hour": 12,
-            "minute": 26,
-            "day": 7,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "07.02.2025 12:26",
         "score": 583.12,
-        "position": 34
+        "position": 40,
+        "timestamp": 1738927560
     },
     {
         "user": "Marcin",
         "input": "gliger",
-        "time": {
-            "hour": 11,
-            "minute": 27,
-            "day": 2,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "02.02.2025 11:27",
         "score": 582.96,
-        "position": 35
+        "position": 41,
+        "timestamp": 1738492020
+    },
+    {
+        "user": "Zefir",
+        "input": "gulgak",
+        "time": "18.02.2025 14:51",
+        "score": 582.4,
+        "position": 42,
+        "timestamp": 1739886660
     },
     {
         "user": "Marcin",
         "input": "wijwor",
-        "time": {
-            "hour": 17,
-            "minute": 43,
-            "day": 1,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "01.02.2025 17:43",
         "score": 581.44,
-        "position": 36
+        "position": 43,
+        "timestamp": 1738428180
     },
     {
         "user": "Marcin",
         "input": "w\u00f3wald",
-        "time": {
-            "hour": 9,
-            "minute": 40,
-            "day": 3,
-            "month": 2,
-            "year": 2025
-        },
+        "time": "03.02.2025 09:40",
         "score": 580.56,
-        "position": 37
+        "position": 44,
+        "timestamp": 1738572000
     },
     {
         "user": "Marcin",
         "input": "psiket",
-        "time": {
-            "hour": 21,
-            "minute": 38,
-            "day": 27,
-            "month": 1,
-            "year": 2025
-        },
+        "time": "27.01.2025 21:38",
         "score": 578.56,
-        "position": 38
+        "position": 45,
+        "timestamp": 1738010280
     },
-    {
-        "user": "Marcin",
-        "input": "gurbox",
-        "time": {
-            "hour": 12,
-            "minute": 10,
-            "day": 5,
-            "month": 2,
-            "year": 2025
-        },
-        "score": 578.56,
-        "position": 39
-    },
-    {
-        "user": "Marcin",
-        "input": "roklat",
-        "time": {
-            "hour": 12,
-            "minute": 13,
-            "day": 5,
-            "month": 2,
-            "year": 2025
-        },
-        "score": 578.24,
-        "position": 40
-    }
-    ]
-
+]
 
 
 
@@ -648,7 +462,7 @@ def mock_leaderboard_list():
 
 def test_check_if_range_is_too_big(mock_leaderboard: Leaderboard, from_index, to_index, to_index_fixed):
 
-    result = mock_leaderboard._check_if_range_is_too_big(from_index, to_index, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+    result = mock_leaderboard._check_if_range_is_too_big(from_index, to_index)
     assert result == to_index_fixed
 
 
@@ -659,13 +473,13 @@ def test_display_leaderboard_default_range(mock_leaderboard: Leaderboard, mock_l
     mock_leaderboard.leaderboard = mock_leaderboard_list
 
 
-    result = mock_leaderboard.display_leaderboard("", wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+    result = mock_leaderboard.display_leaderboard("")
     assert len(result) == 10
     
     
-    assert result[0] == '1. gurbak - 724.48 (Marcin)'
-    assert result[4] == '5. falter - 696.8 (Marcin)'
-    assert result[9] == '10. hagen - 670.88 (Ing)'
+    assert result[0] == '1. mavlah - 742.24 (Zefir)'
+    assert result[4] == '5. waturn - 698.32 (Marcin)'
+    assert result[9] == '10. jalong - 675.44 (Ing)'
 
 
 
@@ -674,13 +488,13 @@ def test_display_leaderboard_custom_range(mock_leaderboard: Leaderboard, mock_le
     mock_leaderboard.leaderboard = mock_leaderboard_list
 
 
-    result = mock_leaderboard.display_leaderboard("10 40", wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+    result = mock_leaderboard.display_leaderboard("10 40")
     assert len(result) == 30
     
     
-    assert result[3] == '13. widwan - 647.76 (Marcin)'
-    assert result[16] == '26. karafka - 599.12 (Marcin)'
-    assert result[21] == '31. kwikon - 589.04 (Marcin)'
+    assert result[3] == '13. laptul - 649.76 (Marcin)'
+    assert result[16] == '26. warkon - 612.48 (Tadeusz)'
+    assert result[21] == '31. karafka - 599.12 (Marcin)'
 
 
 

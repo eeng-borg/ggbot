@@ -77,16 +77,7 @@ class Command:
         command_data["command"] = command_name
         command_data["input"] = input
         command_data['timestamp'] = int(time.time())
-
-        time_data = {}
-
-        time_data["hour"] = datetime.now().hour
-        time_data["minute"] = datetime.now().minute
-        time_data["day"] = datetime.now().day
-        time_data["month"] = datetime.now().month
-        time_data["year"] = datetime.now().year
-
-        command_data["time"] = time_data
+        command_data["time"] = datetime.now().strftime("%d.%m.%Y %H:%M")
 
         return command_data
     
