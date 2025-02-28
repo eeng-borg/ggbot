@@ -20,7 +20,7 @@ from command_modules.binguj import binguj
 # from command_modules.bingus_gpt import bingus_gpt
 from command_modules.korniszon_module.korniszon import Korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
-from command_modules.korniszon_module.best_korniszon_by_day import best_korniszon_by_day 
+from command_modules.korniszon_module.topniszon import Topniszon
 from command_modules.korniszon_module.random_korniszon import SpamKorniszon
 from command_modules.command import Command
 
@@ -132,6 +132,7 @@ leaderboard = Leaderboard(driver)
 korniszon = Korniszon(driver, leaderboard)
 leaderboard.load_leaderboard()
 spam_korniszon = SpamKorniszon(driver, leaderboard)
+topniszon = Topniszon(driver)
 
 
 
@@ -190,7 +191,7 @@ while(True):
 
                 if topniszon_commands_data:
                     for data in topniszon_commands_data:
-                        best_korniszon_by_day(driver, data, leaderboard)
+                        topniszon.best_korniszon_by_day(data, leaderboard)
 
 
                 ranking_commands_data = Command.get_commands_by_type(str(ranking_command))

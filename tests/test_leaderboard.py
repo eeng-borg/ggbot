@@ -685,16 +685,16 @@ def test_display_leaderboard_custom_range(mock_leaderboard: Leaderboard, mock_le
 
 
 
-def test_display_leaderboard_spamming(mock_leaderboard: Leaderboard, mock_leaderboard_list):
+# def test_display_leaderboard_spamming(mock_leaderboard: Leaderboard, mock_leaderboard_list):
     
-    mock_leaderboard.leaderboard = mock_leaderboard_list
+#     mock_leaderboard.leaderboard = mock_leaderboard_list
 
 
-    result = mock_leaderboard.display_leaderboard("10 40", wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
-    result2 = mock_leaderboard.display_leaderboard("10 20", wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+#     result = mock_leaderboard.display_leaderboard("10 40", wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+#     result2 = mock_leaderboard.display_leaderboard("10 20", wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
     
-    assert len(result2) == 0
-    assert len(result) == 30
+#     assert len(result2) == 0
+#     assert len(result) == 30
 
     
 

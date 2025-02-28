@@ -10,12 +10,13 @@ from selenium.webdriver.remote.webelement import WebElement
 
 class Command:
 
-    # -- CLASS ATRIBUTES    
+    # -- CLASS ATRIBUTES
     command_type_list = [] # List of all commands and their descriptions, to use in help command 
     received_commands = [] # list of all commands extracted from messages
 
     # this flag is triggered after any command is found, so then we can run clear_chat() after the last command logic was executed
     is_any_command_found = False
+
 
 
     def __init__(self, driver: webdriver.Chrome, command_name: str, description: str):
@@ -28,9 +29,13 @@ class Command:
         # add command name and description to use it in /help
         Command.command_type_list.append({"command_name": command_name, "description": description})
 
+
+
     # get command name while initing
     def __str__(self):
         return str(self.command_name)
+
+
 
     @staticmethod
     def __commandXpath(command_name):
@@ -43,6 +48,7 @@ class Command:
 
         return xpath
     
+
     
     @staticmethod
     def __get_input_text(raw_command_element, command_name):

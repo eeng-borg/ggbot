@@ -171,7 +171,7 @@ class Leaderboard:
             
             # check if range not too big, to avoid spamming with 1k long ranking lists
             # if it is - subtract the end range value
-            to_index = self._check_if_range_is_too_big(from_index, to_index, wait_find_input_and_send_keys=wait_find_input_and_send_keys)
+            to_index = self._check_if_range_is_too_big(from_index, to_index)
 
             responses = []
 
