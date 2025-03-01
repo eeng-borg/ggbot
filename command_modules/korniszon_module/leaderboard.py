@@ -1,8 +1,7 @@
 from http.client import responses
 
-from audioop import reverse
-from utils.utilities import wait_find_input_and_send_keys, wait_find_and_return, wait_find_and_click, clear_chat, filter_bmp
-from utils.types import CommandData, KorniszonData
+from utils.utilities import wait_find_input_and_send_keys
+from utils.types import CommandData
 import json
 import os
 import time

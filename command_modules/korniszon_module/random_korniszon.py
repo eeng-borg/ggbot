@@ -1,12 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from datetime import datetime
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from utils.utilities import wait_find_input_and_send_keys
 import random
 import time
 import threading
-
+import os
+import json
 
 
 class SpamKorniszon:
@@ -45,25 +45,43 @@ class SpamKorniszon:
 
 
     # set new timer and start spamming
-    def set_spamming_time(self, driver: webdriver.Chrome, command_data):
+    def set_spamming_time(self, input=None, quiet=False):
+
+
+        if input == None:
+
+            with open("settings", 'r', encoding='utf-8') as f:
+                settings = json.load(f)
+
+            input_time = settings['spam_time']
+
+        else:
+            input_time = input
+
+
+
 
         try:
-            new_spam_time = int(command_data['input'])
+            new_spam_time = int(str(input_time))
 
             if new_spam_time > SpamKorniszon.spam_limit:
-
+                
+                
                 SpamKorniszon.spam_time = new_spam_time * 60 # bcs minutes
               
                 if self.thread == None:
                     self.thread = threading.Thread(target = self.__spamming, daemon=True) # starts the thread on main thread
                     self.thread.start() # do not exexutes
 
-                response = f"Spam co {new_spam_time} minut (normalnych) <w8>"
-                wait_find_input_and_send_keys(driver, 1, By.ID, "chat-text", response)
+                if quiet == False:
+                    response = f"Spam co {new_spam_time} minut (normalnych) <w8>"
+                    wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
 
 
         except ValueError:
-            pass
+            response = "Wprowadź liczbę kolego :)"
+            wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+            return
 
 
 

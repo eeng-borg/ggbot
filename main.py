@@ -1,4 +1,5 @@
 from selenium import webdriver
+import undetected_chromedriver as uc
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -50,7 +51,10 @@ sys.excepthook = log_exception
 def __create_driver() -> webdriver.Chrome:
 
     print("Driver created")
-    chrome_options = Options()
+    # chrome_options = Options()
+    chrome_options = uc.ChromeOptions()
+
+
     
 
     # Prevent Chrome from closing due to multiple instances
@@ -68,12 +72,15 @@ def __create_driver() -> webdriver.Chrome:
         # chrome_options.add_argument("--start-maximized") # so it looks more human-like
         chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration (recommended in headless mode)
         chrome_options.add_argument("--no-sandbox")  # Disable sandboxing for headless mode (some environments need this)
-        chrome_options.add_argument("--disable-dev-shm-usage") # Avoid Chrome crash by disabling shared memory
-        chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Prevent detection
-        # chrome_options.add_argument("--disable-features=VizDisplayCompositor")
-        chrome_options.add_argument("--enable-logging")
-        chrome_options.add_argument("--v=1")
-        chrome_options.add_argument("--window-size=800x600")  # Ensure proper rendering
+        # chrome_options.add_argument("--disable-dev-shm-usage") # Avoid Chrome crash by disabling shared memory
+        # chrome_options.add_argument("--disable-blink-features=AutomationControlled")  # Prevent detection
+        # chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        # chrome_options.add_experimental_option('useAutomationExtension', False)
+
+        # # chrome_options.add_argument("--disable-features=VizDisplayCompositor")
+        # chrome_options.add_argument("--enable-logging")
+        # chrome_options.add_argument("--v=1")
+        chrome_options.add_argument("--window-size=1920,1080")  # Ensure proper rendering
     
     
 
@@ -96,7 +103,7 @@ def __create_driver() -> webdriver.Chrome:
 
         
         # create a driver
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = uc.Chrome(service=service, options=chrome_options)
 
     except Exception as e:
         print(f"Error initializing the Chrome driver: {e}")
@@ -133,6 +140,7 @@ leaderboard = Leaderboard(driver)
 korniszon = Korniszon(driver, leaderboard)
 leaderboard.load_leaderboard()
 spam_korniszon = SpamKorniszon(driver, leaderboard)
+spam_korniszon.set_spamming_time(quiet=True)
 topniszon = Topniszon(driver)
 
 
@@ -185,7 +193,7 @@ while(True):
 
                 if spam_commands_data:
                     for data in spam_commands_data:
-                        spam_korniszon.set_spamming_time(driver, data)
+                        spam_korniszon.set_spamming_time(data['input'])
 
 
                 topniszon_commands_data = Command.get_commands_by_type(str(topniszon_command))
