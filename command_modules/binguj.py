@@ -5,14 +5,20 @@ import time
 from typing import Dict
 
 
-def generate_image(driver: webdriver.Chrome, commandText: str, tabs: Dict[str,str]):
+def generate_image(driver: webdriver.Chrome, commandText, tabs: Dict[str,str]):
     # switch to bing tab
-    driver.switch_to.window(tabs["bing tab"]) # switch to bing tab    
+    driver.switch_to.window(tabs["bing tab"]) # switch to bing tab
 
     # wait until bing ai searchbox has loaded and look for it to send a prompt
-    wait_find_input_and_send_keys(driver, 1, By.CLASS_NAME, "b_searchbox", commandText)
+    wait_find_input_and_send_keys(driver, 1, By.CLASS_NAME, "b_searchbox", commandText, send=False)
+
+    # find button 'create' to generate a image
+    wait_find_and_click(driver, 1, By.XPATH, "//*[contains(@class, 'gi_btn_p') and contains(@class, 'linkBtn')]")
+    print("Button create clicked")
+
     wait_find_and_click(driver, 10, By.CLASS_NAME, "imgri-container") # click on generated image to open Iframe
     print("Image generated")
+
 
 
 def get_image_link(driver: webdriver.Chrome) -> str|None:
@@ -43,7 +49,7 @@ def get_image_link(driver: webdriver.Chrome) -> str|None:
 
 
 
-def send_image(driver: webdriver.Chrome, image_link: str|None, tabs: Dict[str,str]):
+def send_image(driver: webdriver.Chrome, image_link, tabs: Dict[str,str]):
 
     driver.switch_to.window(tabs["main tab"]) # switch back to chat tab
     if image_link is None:
@@ -57,7 +63,7 @@ def send_image(driver: webdriver.Chrome, image_link: str|None, tabs: Dict[str,st
 
 #-------------------------------------------------------------
 # MAIN MODULE FUNCTION
-def binguj(driver: webdriver.Chrome, commandText: str, tabs: Dict[str,str]):
+def binguj(driver: webdriver.Chrome, commandText, tabs: Dict[str,str]):
 
     time.sleep(1) # wait for the command to be sent, idk why but it won't work without it
     # send message on chat that image is being generated

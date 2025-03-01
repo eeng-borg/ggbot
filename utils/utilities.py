@@ -24,7 +24,7 @@ def wait_find_and_click(context, waitTime, by, elementName):
 
 
 # wait until input bar has loaded, look for it and send text with ENTER
-def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText):
+def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText, send=True):
     # for attempt in range(3):  # Retry up to 3 times
     #     try:
             # Wait for the element to be present
@@ -34,22 +34,15 @@ def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText)
     # Find and interact with the element
     element = context.find_element(by, elementName)
     element.clear()
-    element.send_keys(inputText + Keys.ENTER)
+
+    _sending_keys = inputText
+
+    if send == True:
+        _sending_keys += Keys.ENTER
+
+    element.send_keys(_sending_keys)
 
 
-
-async def async_wait_find_input_send_keys(context, waitTime, by, elementName, inputText):
-    # for attempt in range(3):  # Retry up to 3 times
-    #     try:
-            # Wait for the element to be present
-    WebDriverWait(context, waitTime + base_wait_time).until(
-        EC.presence_of_element_located((by, elementName))
-    )
-    # Find and interact with the element
-    element = context.find_element(by, elementName)
-    element.clear()
-    element.send_keys(inputText + Keys.ENTER)
-    
 
 
 # find element by type and return it
@@ -60,8 +53,12 @@ def wait_find_and_return(context, waitTime, by, elementName):
     element = context.find_element(by, elementName)
     return element
 
+
+
 def filter_bmp(text):
     return ''.join(c for c in text if ord(c) <= 0xFFFF)
+
+
 
 def clear_chat(driver):
     toolbar = wait_find_and_return(driver, 1, By.CLASS_NAME, "toolbar-right") # find chat toolbar

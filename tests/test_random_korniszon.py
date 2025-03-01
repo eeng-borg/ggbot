@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from unittest.mock import MagicMock, patch
 from command_modules.korniszon_module.random_korniszon import SpamKorniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
-from utils.utilities import async_wait_find_input_send_keys, wait_find_input_and_send_keys
 
 # @pytest.fixture(scope="class")
 # def mock_driver():
