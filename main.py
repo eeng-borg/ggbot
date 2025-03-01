@@ -140,7 +140,7 @@ leaderboard = Leaderboard(driver)
 korniszon = Korniszon(driver, leaderboard)
 leaderboard.load_leaderboard()
 spam_korniszon = SpamKorniszon(driver, leaderboard)
-spam_korniszon.set_spamming_time(quiet=True)
+spam_korniszon.set_spamming_time(41, quiet=True)
 topniszon = Topniszon(driver)
 
 

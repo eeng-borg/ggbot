@@ -1,12 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from datetime import datetime
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from utils.utilities import wait_find_input_and_send_keys
 import random
 import time
 import threading
-import os
-import json
+
 
 
 class SpamKorniszon:
@@ -45,24 +45,12 @@ class SpamKorniszon:
 
 
     # set new timer and start spamming
-    def set_spamming_time(self, input=None, quiet=False):
+    def set_spamming_time(self, input, quiet=False):
 
 
-        if input == None:
-
-            with open("settings", 'r', encoding='utf-8') as f:
-                settings = json.load(f)
-
-            input_time = settings['spam_time']
-
-        else:
-            input_time = input
-
-
-
-
+        
         try:
-            new_spam_time = int(str(input_time))
+            new_spam_time = int(input)
 
             if new_spam_time > SpamKorniszon.spam_limit:
                 
