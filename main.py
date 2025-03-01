@@ -120,7 +120,8 @@ binguj_command = Command(driver, 'binguj', "wpisz prompty na obrazek jaki chcesz
 bingus_gpt_command = Command(driver, 'bingus', "zapytaj się bingusa o cokolwiek, może pomoże ;>")
 korniszon_command = Command(driver, 'korniszon', "pokaż swojego korniszona, ocenimy uczciwie ;))")
 spam_command = Command(driver, 'spam', "co ile sekund ma spamować korniszonami <chatownik>") 
-topniszon_command = Command(driver, 'topniszon', "najlepszy korniszon z dziś <okularnik>")
+topniszon_command = Command(driver, 'topniszon', "najlepszy korniszon <okularnik>. Wybierz dzień obecnego miesiąca, albo wpisz samą komendę żeby pokazać dzisiejszego")
+worstniszon_command = Command(driver, 'worstniszon', "najgorszy korniszon <głupek>. Wybierz dzień obecnego miesiąca, albo wpisz samą komendę żeby pokazać dzisiejszego")
 ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych korniszonów w kosmosie!! Podaj 1-2 numery, aby określić zakres.")
 staty_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
 # restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
@@ -192,6 +193,15 @@ while(True):
                 if topniszon_commands_data:
                     for data in topniszon_commands_data:
                         topniszon.best_korniszon_by_day(data.get('input'), leaderboard)
+
+
+
+                worstniszon_commands_data = Command.get_commands_by_type(str(worstniszon_command))
+
+                if worstniszon_commands_data:
+                    for data in worstniszon_commands_data:
+                        topniszon.best_korniszon_by_day(data.get('input'), leaderboard, best=False)
+                        
 
 
                 ranking_commands_data = Command.get_commands_by_type(str(ranking_command))

@@ -80,6 +80,14 @@ def mock_leaderboard_list():
         "score": 557.56,
         "position": 90,
         "timestamp": 1739966340
+    },    
+    {
+        "user": "Zefir",
+        "input": "nieliczony worstniszon",
+        "time": "19.02.2025 13:48",
+        "score": 0.0,
+        "position": 11359,
+        "timestamp": 1739969280
     },]
 
 
@@ -116,6 +124,19 @@ def test_input_to_when(mock_topniszon: Topniszon, input, result):
 def test_best_korniszon_by_day(mock_topniszon: Topniszon, input, result, mock_leaderboard: Leaderboard):
 
     message = mock_topniszon.best_korniszon_by_day(input, mock_leaderboard, datetime_now=datetime.fromtimestamp(1740401280)) # 24.02.2025 13:48
+    assert message == result
+
+
+
+@pytest.mark.parametrize("input, result", [
+    ('', "Najgorszy dziś <wyśmiewacz>\n576. hu\u0107pa - 446.56 (Ing) o 16:18"),
+    ("23", "Najgorszy z 23 dnia tego miesiąca <wyśmiewacz>\n1036. gromix - 398.8 (Ing) o 17:10"),
+    ("19", "Najgorszy z 19 dnia tego miesiąca <wyśmiewacz>\n90. boron - 557.56 (Zefir) o 12:59"),
+    ])
+
+def test_worst_korniszon_by_day(mock_topniszon: Topniszon, input, result, mock_leaderboard: Leaderboard):
+
+    message = mock_topniszon.best_korniszon_by_day(input, mock_leaderboard, best=False, datetime_now=datetime.fromtimestamp(1740401280)) # 24.02.2025 13:48
     assert message == result
 
         

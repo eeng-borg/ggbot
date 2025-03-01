@@ -50,15 +50,15 @@ class Topniszon:
 
 
         # so return is always a string
-        # response = ''
-        # _leaderboard = leaderboard.leaderboard
+        response = ''
+        _leaderboard = leaderboard.leaderboard
 
-        # if best is False:
+        if best is False:
+            _leaderboard = list(reversed(leaderboard.leaderboard))
 
 
 
-
-        for korniszon in leaderboard.leaderboard:
+        for korniszon in _leaderboard:
 
             # if input is empty, then lets assume that user wants the best one from today
             # if day_input == '':
@@ -70,18 +70,28 @@ class Topniszon:
                 korniszon_datetime = datetime.fromtimestamp(timestamp)
 
                 if korniszon_datetime.day == self.day_input and korniszon_datetime.month == datetime_now.month and korniszon_datetime.year == datetime_now.year:
+                    # can't really say which one at 0 score is the worst, so instead we are counting the worst one that scored any points
+                    if korniszon['score'] > 0:
+                        
+                        position = korniszon.get('position')
+                        input = korniszon.get('input')
+                        score = korniszon.get('score')
+                        user = korniszon.get('user')
 
-                    position = korniszon.get('position')
-                    input = korniszon.get('input')
-                    score = korniszon.get('score')
-                    user = korniszon.get('user')
+                        hour = korniszon_datetime.hour
+                        minute = korniszon_datetime.minute
 
-                    hour = korniszon_datetime.hour
-                    minute = korniszon_datetime.minute
+                        response = ""
+                        
 
-                    response = (f"Najlepszy {when} <paker>\n"
-                    f"{position}. {input} - {score} ({user}) o {hour}:{minute:02d}")
+                        if best is True:
+                            response = f"Najlepszy {when} <paker>\n"
+                        else:
+                            response = f"Najgorszy {when} <wyśmiewacz>\n"
 
 
-                    self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
-                    return response
+                        response += f"{position}. {input} - {score} ({user}) o {hour}:{minute:02d}"
+
+
+                        self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+                        return response
