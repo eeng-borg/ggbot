@@ -14,37 +14,40 @@ import os
 class SpamKorniszon:
 
 
-    def __init__(self, driver: webdriver.Chrome, leaderboard: Leaderboard) -> None:
+    def __init__(self, driver: webdriver.Chrome, leaderboard: Leaderboard, wait_find_input_and_send_keys=wait_find_input_and_send_keys) -> None:
+        
         self.driver = driver
         self.leaderboard = leaderboard
+        self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
 
         self.thread = None
         self.stop_event = threading.Event()
 
         self.spam_time = 30
         self.spam_limit = 0
-        # self.up_spam_limit = 
+        self.spam_time_left = 0
 
 
-    
 
-    def __spamming(self):
 
-        while not self.stop_event.is_set():
+    def _spamming(self):
 
-            print(f'spamming: {self.spam_time}')
+        while True:
+            time.sleep(0.01)
+            self.spam_time_left -= 0.01
+            # print(f"Time left: {self.spam_time_left}")
 
-            response = ''        
-            for a in range(random.randint(1,3)):
+            if self.spam_time_left < 0:
 
-                korniszon = random.choice(self.leaderboard.leaderboard)
-                response += f"{korniszon['input']} "
-            
-            print(f"response: {response}")
-            wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+                response = ''        
+                for a in range(random.randint(1,3)):
 
-            time.sleep(self.spam_time)
-
+                    korniszon = random.choice(self.leaderboard.leaderboard)
+                    response = f"{korniszon['input']} "
+                
+                print(f"response: {response}")
+                self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+                self.spam_time_left = self.spam_time                
 
 
 
@@ -99,7 +102,7 @@ class SpamKorniszon:
 
         except ValueError:
             response = "Wprowadz liczbę kolego :)"
-            wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+            self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
             return
 
 
@@ -108,19 +111,20 @@ class SpamKorniszon:
         new_spam_time = int(str(spam_time))
         
 
-        if new_spam_time > self.spam_limit:            
+        if new_spam_time > self.spam_limit:
             
             self.spam_time = new_spam_time * 60 # bcs minutes
+            self.spam_time_left = self.spam_time
+            print(f'spamming: {self.spam_time}')
             
-            # if self.thread == None:
-
-            self.thread = threading.Thread(target = self.__spamming, daemon=True) # starts the thread on main thread
-            self.thread.start() # do not exexutes
+            if self.thread == None:
+                self.thread = threading.Thread(target = self._spamming, daemon=True) # starts the thread on main thread
+                self.thread.start() # do not exexutes
 
 
             if quiet == False:
                 response = f"Spam co {new_spam_time} minut (normalnych) <w8>"
-                wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+                self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
 
 
 
