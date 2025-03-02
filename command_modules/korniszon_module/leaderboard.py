@@ -32,14 +32,10 @@ class Leaderboard:
             with open(self.leaderboard_file_name, 'w', encoding='utf-8') as f:
                 json.dump(self.leaderboard, f, indent=4)
 
-        # load dict from a JSON file        
-        try:
-            with open(self.leaderboard_file_name, 'r', encoding='utf-8') as f:
-                self.leaderboard = json.load(f)
 
-        except json.JSONDecodeError:
-            print("Błąd JSON! Resetuję leaderboard.")
-            # self.leaderboard = {}
+        # load dict from a JSON file        
+        with open(self.leaderboard_file_name, 'r', encoding='utf-8') as f:
+                self.leaderboard = json.load(f)
 
 
 

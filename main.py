@@ -140,7 +140,7 @@ leaderboard = Leaderboard(driver)
 korniszon = Korniszon(driver, leaderboard)
 leaderboard.load_leaderboard()
 spam_korniszon = SpamKorniszon(driver, leaderboard)
-spam_korniszon.set_spamming_time(41, quiet=True)
+spam_korniszon.set_spamming_time(quiet=True)
 topniszon = Topniszon(driver)
 
 
@@ -193,7 +193,7 @@ while(True):
 
                 if spam_commands_data:
                     for data in spam_commands_data:
-                        spam_korniszon.set_spamming_time(data['input'])
+                        spam_korniszon.set_spamming_time(input=data['input'])
 
 
                 topniszon_commands_data = Command.get_commands_by_type(str(topniszon_command))
