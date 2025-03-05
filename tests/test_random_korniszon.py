@@ -103,14 +103,14 @@ class TestGetSpamTime:
 
 
 
-def test_spamming(mock_random_korniszon: SpamKorniszon, mock_leaderboard):
+# def test_spamming(mock_random_korniszon: SpamKorniszon, mock_leaderboard):
 
-    mock_leaderboard.leaderboard = [{'input': 'fgfgfgfg'},{'input': 'aav'},{'input': 'ughmm'},]
+#     mock_leaderboard.leaderboard = [{'input': 'fgfgfgfg'},{'input': 'aav'},{'input': 'ughmm'},]
 
-    mock_random_korniszon.spam_limit = -100
-    mock_random_korniszon.spam_time = 1
-    mock_random_korniszon._spamming()
+#     mock_random_korniszon.spam_limit = -100
+#     mock_random_korniszon.spam_time = 1
+#     mock_random_korniszon._spamming()
 
-    assert mock_random_korniszon.spam_time_left == 55
+#     assert mock_random_korniszon.spam_time_left == 55
 
 

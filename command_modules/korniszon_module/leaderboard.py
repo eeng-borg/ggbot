@@ -1,10 +1,14 @@
 from http.client import responses
 
+from yarl import Query
+
+from sql_database import Database
 from utils.utilities import wait_find_input_and_send_keys
 from utils.types import CommandData
 import json
 import os
 import time
+from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from typing import Dict, Optional
@@ -12,14 +16,17 @@ from typing import Dict, Optional
 
 # korniszon leaderboard
 class Leaderboard:
+    
 
     leaderboard_file_name = "leaderboard_new.json"
 
-    def __init__(self, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+    def __init__(self, database: Database, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+        self.database = database
         self.leaderboard = []
         self.driver = driver
         self.leaderboard_is_displayed = False
         self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
+
 
 
     def load_leaderboard(self):
@@ -40,54 +47,38 @@ class Leaderboard:
 
 
 
-    def add_korniszon(self, command_data: CommandData, score: float):
+    def add_korniszon(self, command_data, score: float):
 
-        new_korniszon = {}
+        korniszon_table = os.getenv('MAIN_TABLE_NAME')
+        query = f"INSERT INTO {korniszon_table} (user, input, score, created) VALUES (%s, %s, %s, %s)"
 
-        # add score to new_korniszon data and remove command key
-        for data_key, data_value in command_data.items():
-            new_korniszon[data_key] = data_value
+        created = datetime.fromtimestamp(command_data.get('timestamp')).strftime("%Y-%m-%d %H:%M:%S")
 
-        # every command here is /korniszon, so we don't need it 
-        del new_korniszon['command']
-        new_korniszon["score"] = score
-
-        # add new result
-        self.leaderboard.append(new_korniszon)
-
-        # print(f"add new result:  {self.leaderboard}")
-
-        # sort
-        sorted_leaderboard = sorted(self.leaderboard, key=lambda x: x.get('score', 0), reverse=True) # print(sorted_leaderboard)
-        
-        # add updated position
-        for index, korniszon in enumerate(sorted_leaderboard):
-            korniszon["position"] = index + 1
+        values = (command_data.get('user'), command_data.get('input'), score, created)
 
 
-        # Save to a JSON file
-        with open(self.leaderboard_file_name, 'w', encoding='utf-8') as f:
-            # print(f"Zapisuje: {sorted_leaderboard}")
-            json.dump(sorted_leaderboard, f, indent=4)
-
-        
-        self.leaderboard = sorted_leaderboard
+        self.database.cursor.execute(query, values)
+        self.database.connection.commit()
+        # self.leaderboard = sorted_leaderboard
     
 
     
     
-    def get_position(self, korniszon_text) -> int | None:
+    def get_position(self, korniszon_input):
 
         # Convert dict keys to a list and find index to determine it's position on leaderboard
         # new_korniszon returns leaderboard_sorted
 
-        for item in self.leaderboard:
+        query = """
+                SELECT position
+                FROM korniszons_test_with_position
+                WHERE input = %s
+                """
+        self.database.cursor.execute(query, (korniszon_input,))
+        position = self.database.cursor.fetchone()[0]
+        print(f"position{position}")
 
-            if item.get("input") == korniszon_text:
-                position = self.leaderboard.index(item) + 1
-                print(f"position: {position}")
-
-                return position
+        return position
         
 
 
@@ -268,6 +259,7 @@ class Leaderboard:
                 ammount += 1
         
         return korniszons
+
 
 
     # user functions

@@ -1,3 +1,4 @@
+from h11 import Data
 from selenium import webdriver
 import undetected_chromedriver as uc
 from selenium.webdriver.chrome.service import Service
@@ -11,6 +12,7 @@ from dotenv import load_dotenv, find_dotenv
 from selenium.common.exceptions import TimeoutException
 from utils.utilities import wait_find_input_and_send_keys, clear_chat
 from innit_bot import innit_bot
+from sql_database import Database
 
 
 import traceback
@@ -135,9 +137,9 @@ staty_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
 strona_command = Command(driver, 'strona', "gg platforma z różnymi ciekawymi rzeczami <chatownik>")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
-
-leaderboard = Leaderboard(driver)
-korniszon = Korniszon(driver, leaderboard)
+database = Database()
+leaderboard = Leaderboard(database, driver)
+korniszon = Korniszon(database, driver, leaderboard)
 leaderboard.load_leaderboard()
 spam_korniszon = SpamKorniszon(driver, leaderboard)
 spam_korniszon.set_spamming_time(quiet=True)
