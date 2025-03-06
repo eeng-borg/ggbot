@@ -5,6 +5,7 @@ from utils.types import CommandData
 from command_modules.korniszon_module.korniszon import Korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from users import Cooldown
+from sql_database import Database
 
 
 class SharedData:
@@ -13,9 +14,10 @@ class SharedData:
 @pytest.fixture(scope="module")
 def mock_korniszon() -> Korniszon:
 
+    database = Database()
     driver = webdriver.Chrome()
-    leaderboard = Leaderboard(driver)
-    korniszon = Korniszon(driver, leaderboard)
+    leaderboard = Leaderboard(database, driver)
+    korniszon = Korniszon(database, driver, leaderboard)
 
     return korniszon
 
@@ -57,11 +59,14 @@ def test_repetitions(text, result, mock_korniszon: Korniszon):
     ("kor", 6.67),
     ("korniszonkorniszon", 4.44),
     ])    
+
 def test_score_lenght(text, result, mock_korniszon: Korniszon):
     with patch("random.randint", return_value = 9):  # Mock random.randint to always return 9        
         
         assert round(mock_korniszon.score_lenght(SharedData.base_score, text), 2) == result  # Replace with the expected result
         print("Test passed!")
+
+
 
 
 

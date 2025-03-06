@@ -31,7 +31,25 @@ class Database:
 
         # Get a connection from the pool
         self.connection = pool.get_connection()
-        self.cursor = self.connection.cursor()
+
+
+
+    def fetch(self, query, params=None, dictionary=False):
+
+        cursor = self.connection.cursor(dictionary=dictionary)
+        cursor.execute(query, params)
+        result = cursor.fetchall()
+        cursor.close()
+
+        return result
+    
+
+    def commit(self, query, params=None):
+        
+        cursor = self.connection.cursor()
+        cursor.execute(query, params)
+        self.connection.commit()
+        cursor.close()
 
 
 

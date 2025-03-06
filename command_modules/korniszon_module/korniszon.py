@@ -2,14 +2,17 @@ from utils.utilities import wait_find_input_and_send_keys
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 import random
+import os
 from utils.types import CommandData
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from users import Cooldown
+from sql_database import Database
 
 
 class Korniszon:
 
-    def __init__(self, driver: webdriver.Chrome, leaderboard: Leaderboard):
+    def __init__(self, database: Database, driver: webdriver.Chrome, leaderboard: Leaderboard):
+        self.database = database
         self.driver = driver
         self.leaderboard = leaderboard
 
@@ -148,34 +151,7 @@ class Korniszon:
         return round(score, 2)
 
 
-    # def calculate_time(self):
 
-    #     second_place = self.leaderboard.leaderboard[1]
-        
-    #     years = datetime.now().year - second_place.get('time')['year']
-    #     months = datetime.now().month - second_place.get('time')['month']
-    #     days = datetime.now().day - second_place.get('time')['day']
-    #     hours = datetime.now().hour - second_place.get('time')['hour']
-    #     minutes = datetime.now().minute - second_place.get('time')['minute']
-
-    #     czas = ''
-
-    #     if years > 0:
-    #         czas = f"{years} lat "
-
-    #     if months > 0:
-    #         czas += f"{months} miesięcy "
-
-    #     if days > 0:
-    #         czas += f"{days} dni "
-
-    #     if hours > 0:
-    #         czas += f"{hours} godzin "
-
-    #     if minutes > 0:
-    #         czas += f"{minutes} minut "        
-
-    #     return czas
 
 
     def _send_results(self, score, korniszon_input, position):
@@ -221,30 +197,6 @@ class Korniszon:
         wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 
 
-    # def edge_cases(self, korniszon_input):
-
-    #     # if duplicates
-    #     # print(f"Korniszon: {korniszon_input} in {leaderboard.leaderboard}")
-    #     if any(korniszon_input == entry["input"] for entry in self.leaderboard.leaderboard):
-
-    #         pozycja = self.leaderboard.get_position(korniszon_input)
-    #         response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
-    #         return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
-        
-    #     # edge cases
-    #     # in case there were no letters in korniszon and you were left with empty variable
-    #     if len(korniszon_input) == 0:
-
-    #         response = f"{random.randint(-784545, -3456)} punktów <zniesmaczony>. Naum się w korniszony!"
-    #         return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
-        
-
-    #     elif len(korniszon_input) > 30:
-
-    #         response = "Nie będę oceniał takiego długasa <nono>"
-    #         return wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)    
-
-
 
     def cooldown_wait_responde(self, cooldown: Cooldown, korniszon_data: CommandData):
         time_left = cooldown.time_remaining()
@@ -257,8 +209,19 @@ class Korniszon:
     
     def exceptions(self, korniszon_input):
 
+        table = os.getenv('MAIN_TABLE_NAME')
+        query = f"""
+                SELECT input
+                FROM {table}
+                WHERE input = %s
+                LIMIT 1
+                """
+        
+        result = self.database.fetch(query,(korniszon_input,))        
+        exists = bool(result)
+
         # in case if korniszon is already on leaderborad
-        if any(korniszon_input == entry["input"] for entry in self.leaderboard.leaderboard):
+        if exists:
 
             pozycja = self.leaderboard.get_position(korniszon_input)
             response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
@@ -303,7 +266,7 @@ class Korniszon:
 
 
             if self.exceptions(korniszon_input):
-                return             
+                return
 
             # check each character unicode number and then modulo them to get some random numbers, I want to make it hard to predict
             score = self.score_characters_value(score, korniszon_input)

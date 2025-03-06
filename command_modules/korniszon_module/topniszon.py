@@ -63,10 +63,10 @@ class Topniszon:
             # if input is empty, then lets assume that user wants the best one from today
             # if day_input == '':
 
-            if korniszon['timestamp'] != None:
+            if korniszon['created'] != None:
                 
                 # convert timestamp to datetime object for better handling
-                timestamp = korniszon['timestamp']
+                timestamp = korniszon['created']
                 korniszon_datetime = datetime.fromtimestamp(timestamp)
 
                 if korniszon_datetime.day == self.day_input and korniszon_datetime.month == datetime_now.month and korniszon_datetime.year == datetime_now.year:

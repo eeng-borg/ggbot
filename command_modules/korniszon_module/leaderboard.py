@@ -16,7 +16,7 @@ from typing import Dict, Optional
 
 # korniszon leaderboard
 class Leaderboard:
-    
+
 
     leaderboard_file_name = "leaderboard_new.json"
 
@@ -31,18 +31,21 @@ class Leaderboard:
 
     def load_leaderboard(self):
 
-        # check if file exists already, if not made one
-        if not os.path.exists(self.leaderboard_file_name):
-            print("JSON nie istnije!!")
+        table = os.getenv('MAIN_TABLE_NAME') # MAIN_TABLE_NAME=korniszons_test
+        query = f"SELECT * FROM {table}_with_position"
+        self.leaderboard_datetime = self.database.fetch(query, dictionary=True)
 
-            # Save dict to a JSON file if it doesn't exist
-            with open(self.leaderboard_file_name, 'w', encoding='utf-8') as f:
-                json.dump(self.leaderboard, f, indent=4)
+        
+        self.leaderboard = self.leaderboard_datetime
 
+        for entry in self.leaderboard:
+            entry['created'] = datetime.timestamp(entry['created'])
+            
+        
 
-        # load dict from a JSON file        
-        with open(self.leaderboard_file_name, 'r', encoding='utf-8') as f:
-                self.leaderboard = json.load(f)
+        print(f"leaderboard: {self.leaderboard}")
+        return self.leaderboard
+        
 
 
 
@@ -56,9 +59,8 @@ class Leaderboard:
 
         values = (command_data.get('user'), command_data.get('input'), score, created)
 
+        self.database.commit(query, values)
 
-        self.database.cursor.execute(query, values)
-        self.database.connection.commit()
         # self.leaderboard = sorted_leaderboard
     
 
@@ -69,16 +71,17 @@ class Leaderboard:
         # Convert dict keys to a list and find index to determine it's position on leaderboard
         # new_korniszon returns leaderboard_sorted
 
-        query = """
+        table = os.getenv('MAIN_TABLE_NAME')
+        query = f"""
                 SELECT position
-                FROM korniszons_test_with_position
+                FROM {table}_with_position
                 WHERE input = %s
                 """
-        self.database.cursor.execute(query, (korniszon_input,))
-        position = self.database.cursor.fetchone()[0]
-        print(f"position{position}")
+
+        position = self.database.fetch(query, (korniszon_input,))[0][0]
 
         return position
+
         
 
 
@@ -105,7 +108,7 @@ class Leaderboard:
 
         try:
             if len(input_list) >= 2:
-                from_index = int(input_list[0]) - 1
+                from_index = int(input_list[0])
                 to_index = int(input_list[1])
 
             elif len(input_list) == 1:
@@ -122,7 +125,6 @@ class Leaderboard:
 
 
     def _check_if_range_is_too_big(self, from_index, to_index, max_range=30):
-        
 
 
         index_range = to_index - from_index # 120 - 30 = 90
@@ -147,10 +149,12 @@ class Leaderboard:
         
 
         if self.leaderboard_is_displayed == False:
+
             self.leaderboard_is_displayed = True
 
             from_index = 0
             to_index = 10
+
 
             if len(data_input) > 0: # input always return string, empty string acts like none
                 # remove everything except numbers and spaces
@@ -163,36 +167,38 @@ class Leaderboard:
             # if it is - subtract the end range value
             to_index = self._check_if_range_is_too_big(from_index, to_index)
 
-            responses = []
+            table = os.getenv('MAIN_TABLE_NAME') # MAIN_TABLE_NAME=korniszons_test
+            query = f"""
+                    SELECT * 
+                    FROM {table}_with_position
+                    WHERE position BETWEEN %s AND %s
+                    """
+            
+            # from index jest gdzieś -1 robiony sprawdź
+
+            ranking_range = self.database.fetch(query, (from_index, to_index), dictionary=True)
+            print(f"Range ({from_index}-{to_index}): {ranking_range}")
+
+            response = ''
+
+            for ranking_position in ranking_range:
+
+                position = ranking_position['position']
+                input = ranking_position['input']
+                user = ranking_position['user']
+                score = ranking_position['score']
 
 
-            if len(self.leaderboard) > 0:
-                for korniszon in self.leaderboard[from_index : to_index]:
+                response += f"{position}. {input} - {score}"
 
-                    input = korniszon.get("input")
-                    score = korniszon.get("score")
-                    user = korniszon.get("user")
-                    position = korniszon.get("position")
-
-                    response = f"{position}. {input} - {score}"
-
-                    # not all korniszons have users, so I want add them only if it's not None, otherwise don't add anything
-                    if user:
-                        response += f" ({user})"
-
-                    responses.append(response) # for testing
-
-                    self.wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
+                if user is not None:
+                    response += f" ({user})"
+                
+                response += "\n"
 
 
-            else:
-                response = "Nic tu nie ma, zrób najpierw jakieś korniszony może :)"
-                self.wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
-
-
+            self.wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
             self.leaderboard_is_displayed = False
-            return responses
-        
         
         else:
             response = "Poczekaj aż pokażę całą listę <luzik>"

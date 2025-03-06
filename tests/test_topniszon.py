@@ -6,6 +6,7 @@ from command_modules.korniszon_module.korniszon import Korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from command_modules.korniszon_module.topniszon import Topniszon
 from datetime import datetime
+from sql_database import Database
 
 
 
@@ -94,7 +95,8 @@ def mock_leaderboard_list():
 
 @pytest.fixture(scope='module')
 def mock_leaderboard(mock_leaderboard_list):
-    leaderboard = Leaderboard(wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+    database = Database()
+    leaderboard = Leaderboard(database, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
     leaderboard.leaderboard = mock_leaderboard_list
     return leaderboard
 
