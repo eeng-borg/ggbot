@@ -28,7 +28,7 @@ class Database:
 
         # Create a pool
         try:
-            pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=1, pool_reset_session=True, **dbconfig)
+            pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=2, pool_reset_session=True, **dbconfig)
             # Get a connection from the pool
             self.connection = pool.get_connection()
         except Exception as e:
@@ -44,7 +44,7 @@ class Database:
         if fetch_one is False:
             result = cursor.fetchall()
         else:
-            result = cursor.fetchone()
+            result = cursor.fetchone()[0]
         cursor.close()
 
         return result

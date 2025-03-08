@@ -1,4 +1,3 @@
-from h11 import Data
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -88,7 +87,7 @@ def __create_driver() -> webdriver.Chrome:
     try:
         if os_type == "Linux":
             print("Running on Linux server")
-            service = Service("/usr/local/bin/chromedriver")
+            service = Service("./chromedriver")
             user_data_dir = os.getenv('PROD_PROFILE') # production
 
         elif os_type == "Windows":

@@ -1,12 +1,14 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
 from command_modules.korniszon_module.leaderboard import Leaderboard
+from sql_database import Database
 
 
 app = Flask(__name__)
 CORS(app)
 
-leaderboard_obj = Leaderboard()
+database = Database()
+leaderboard_obj = Leaderboard(database)
 # print(leaderboard_list)
 
 
