@@ -1,3 +1,4 @@
+from doctest import REPORT_CDIFF
 from http.client import responses
 
 from yarl import Query
@@ -33,15 +34,9 @@ class Leaderboard:
 
         table = os.getenv('MAIN_TABLE_NAME') # MAIN_TABLE_NAME=korniszons_test
         query = f"SELECT * FROM {table}_with_position"
-        self.leaderboard_datetime = self.database.fetch(query, dictionary=True)
+        self.leaderboard = self.database.fetch(query, dictionary=True)     
 
-        
-        self.leaderboard = self.leaderboard_datetime
-
-        for entry in self.leaderboard:
-            entry['created'] = datetime.timestamp(entry['created'])
             
-        
 
         print(f"leaderboard: {self.leaderboard}")
         return self.leaderboard
@@ -78,7 +73,7 @@ class Leaderboard:
                 WHERE input = %s
                 """
 
-        position = self.database.fetch(query, (korniszon_input,))[0][0]
+        position = self.database.fetch(query, (korniszon_input,), fetch_one=True)
 
         return position
 
@@ -199,12 +194,13 @@ class Leaderboard:
 
             self.wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
             self.leaderboard_is_displayed = False
+            return response
         
         else:
-            response = "Poczekaj aż pokażę całą listę <luzik>"
+            response = "Poczekaj aż pokażę cała listę <luzik>"
             self.wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 
-            return []
+            return ''
         
 
 
@@ -296,7 +292,7 @@ class Leaderboard:
             # display user stats
             response = (
                 f"-- STATYSTKI {user} --\n"
-                f"Łącznie zdobytych punktów: {round(score_sum, 2)}\n"
+                f"Łacznie zdobytych punktów: {round(score_sum, 2)}\n"
                 f"Średnia punktów: {round(score_average, 2)}\n"
                 f"Ilość korniszonów: {quantity}\n"
                 f"Top 3 korniszonów:\n"

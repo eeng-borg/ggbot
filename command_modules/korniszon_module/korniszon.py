@@ -159,7 +159,7 @@ class Korniszon:
         # special message if korniszon get top place
         if position == 1:
 
-            response = (f"<paker>!! {korniszon_input} zdobył {score} punktów, zajął 1 miejsce i został nowym liderem rankingu!! <paker>\n")
+            response = (f"<paker>!! {korniszon_input} zdobył {score} punktów, zajał 1 miejsce i został nowym liderem rankingu!! <paker>\n")
                         # f"<paker> {input} był na szczycie przez {calculate_time(leaderboard)} <paker>")
             
         # for other positions
@@ -192,7 +192,7 @@ class Korniszon:
                 emotka = "..... <idiota>"
 
             response = (f"{korniszon_input} zdobył {score} punktów{emotka}\n"
-            f"Zajął {position} miejsce.")
+            f"Zajoł {position} miejsce.")
 
         wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 

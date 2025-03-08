@@ -2,6 +2,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import pyperclip
 
 base_wait_time = 20
 
@@ -35,12 +36,15 @@ def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText,
     element = context.find_element(by, elementName)
     element.clear()
 
-    _sending_keys = inputText
-
-    if send == True:
-        _sending_keys += Keys.ENTER
-
-    element.send_keys(_sending_keys)
+    # Copy text to clipboard
+    pyperclip.copy(inputText)
+    
+    # Use keyboard shortcuts to paste
+    element.send_keys(Keys.CONTROL, 'v')
+    
+    # Send Enter if needed
+    if send:
+        element.send_keys(Keys.ENTER)
 
 
 

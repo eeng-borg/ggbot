@@ -33,8 +33,8 @@ class SpamKorniszon:
     def _spamming(self):
 
         while True:
-            time.sleep(0.01)
-            self.spam_time_left -= 0.01
+            time.sleep(1)
+            self.spam_time_left -= 1
             # print(f"Time left: {self.spam_time_left}")
 
             if self.spam_time_left < 0:
@@ -47,7 +47,7 @@ class SpamKorniszon:
                 
                 print(f"response: {response}")
                 self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
-                self.spam_time_left = self.spam_time                
+                self.spam_time_left = self.spam_time
 
 
 

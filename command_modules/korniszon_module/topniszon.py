@@ -1,6 +1,7 @@
+import os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from utils.types import CommandData
+from sql_database import Database
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from datetime import datetime
 from utils.utilities import wait_find_input_and_send_keys
@@ -10,7 +11,8 @@ from typing import Optional
 class Topniszon:
 
 
-    def __init__(self, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+    def __init__(self, database: Database, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+        self.database = database
         self.driver = driver
         self.day_input = None
         self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
@@ -26,10 +28,10 @@ class Topniszon:
 
             else:
                 self.day_input = int(input)
-                return f"z {self.day_input} dnia tego miesiąca"
+                return f"z {self.day_input} dnia tego miesiaca"
         
         except ValueError:
-            response = "Niepoprawny format <okok>, wprowadź pojedyńcze liczbę z jakiego dnia tego miesiąca chciałbyś topniszona, np /topniszon 5."
+            response = "Niepoprawny format <okok>, wprowadź pojedyńcze liczbę z jakiego dnia tego miesiaca chciałbyś topniszona, np /topniszon 5."
             self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
 
             # for tests mainly
@@ -38,60 +40,69 @@ class Topniszon:
 
 
 
-    def best_korniszon_by_day(self, input, leaderboard: Leaderboard, best=True, datetime_now=datetime.now()):
+    def best_korniszon_by_day(self, day_input, best=True, datetime_now=datetime.now()):
 
-        self.day_input = input
+        self.day_input = day_input
         when = ''
 
 
         # check if input is a number, otherwise throw exception message
-        when = self._input_to_when(input, datetime_now)
+        when = self._input_to_when(day_input, datetime_now)
         print(f"Day: {self.day_input}")
 
 
         # so return is always a string
         response = ''
-        _leaderboard = leaderboard.leaderboard
-
-        if best is False:
-            _leaderboard = list(reversed(leaderboard.leaderboard))
 
 
+        year_now = datetime_now.year
+        month_now = datetime_now.month
+        table = os.getenv('MAIN_TABLE_NAME')
 
-        for korniszon in _leaderboard:
-
-            # if input is empty, then lets assume that user wants the best one from today
-            # if day_input == '':
-
-            if korniszon['created'] != None:
-                
-                # convert timestamp to datetime object for better handling
-                timestamp = korniszon['created']
-                korniszon_datetime = datetime.fromtimestamp(timestamp)
-
-                if korniszon_datetime.day == self.day_input and korniszon_datetime.month == datetime_now.month and korniszon_datetime.year == datetime_now.year:
-                    # can't really say which one at 0 score is the worst, so instead we are counting the worst one that scored any points
-                    if korniszon['score'] > 0:
-                        
-                        position = korniszon.get('position')
-                        input = korniszon.get('input')
-                        score = korniszon.get('score')
-                        user = korniszon.get('user')
-
-                        hour = korniszon_datetime.hour
-                        minute = korniszon_datetime.minute
-
-                        response = ""
-                        
-
-                        if best is True:
-                            response = f"Najlepszy {when} <paker>\n"
-                        else:
-                            response = f"Najgorszy {when} <wyśmiewacz>\n"
+        view_name = ''
+        if best:
+            view_name = 'topniszon'
+        else:
+            view_name = 'worstniszon'
 
 
-                        response += f"{position}. {input} - {score} ({user}) o {hour}:{minute:02d}"
+        query = f"""
+                SELECT *
+                FROM {table}_{view_name}
+                WHERE created LIKE %s
+                ORDER BY created DESC
+                """
+        date_pattern = f"{year_now}-{month_now:02d}-{self.day_input:02d}%"
+        print(f"Searching with date pattern: {date_pattern}")
+        topek = self.database.fetch(query, params=(date_pattern,), fetch_one=True, dictionary=True)
+        
+        if topek is None:
+            response = f"Niczego tutaj nie znajdę dla {when} <bezradny>"
+            self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+            return response
 
 
-                        self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
-                        return response
+        response = ''
+        
+
+        if best is True:
+            response = f"Najlepszy {when} <paker>\n"
+        else:
+            response = f"Najgorszy {when} <wyśmiewacz>\n"
+
+
+        position = topek['position']
+        input = topek['input']
+        score = topek['score']
+        user = topek['user']
+
+        created_dt = topek['created']
+        hour = created_dt.hour
+        minute = created_dt.minute
+
+
+        response += f"{position}. {input} - {score} ({user}) o {hour}:{minute:02d}"
+
+
+        self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+        return response

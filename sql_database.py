@@ -27,18 +27,24 @@ class Database:
         }
 
         # Create a pool
-        pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=1, pool_reset_session=True, **dbconfig)
+        try:
+            pool = pooling.MySQLConnectionPool(pool_name="mypool", pool_size=1, pool_reset_session=True, **dbconfig)
+            # Get a connection from the pool
+            self.connection = pool.get_connection()
+        except Exception as e:
+            print(f"Error connecting to database: {e}")
+            sys.exit(1)
 
-        # Get a connection from the pool
-        self.connection = pool.get_connection()
 
 
-
-    def fetch(self, query, params=None, dictionary=False):
+    def fetch(self, query, params=None, dictionary=False, fetch_one=False):
 
         cursor = self.connection.cursor(dictionary=dictionary)
         cursor.execute(query, params)
-        result = cursor.fetchall()
+        if fetch_one is False:
+            result = cursor.fetchall()
+        else:
+            result = cursor.fetchone()
         cursor.close()
 
         return result

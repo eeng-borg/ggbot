@@ -142,6 +142,8 @@ class Command:
     # display a list of all commands and their descriptions
     @staticmethod
     def help():
+        response = ''
         for command in Command.command_type_list:
-            response = f"/{command['command_name']} - {command['description']}"
-            wait_find_input_and_send_keys(Command.driver, 1, By.ID, "chat-text", response)
+            response += f"/{command['command_name']} - {command['description']}\n"        
+        
+        wait_find_input_and_send_keys(Command.driver, 1, By.ID, "chat-text", response)
