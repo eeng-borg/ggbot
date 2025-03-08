@@ -37,10 +37,10 @@ def wait_find_input_and_send_keys(context, waitTime, by, elementName, inputText,
     element.clear()
 
     # Copy text to clipboard
-    pyperclip.copy(inputText)
     
     # Use keyboard shortcuts to paste
-    element.send_keys(Keys.CONTROL, 'v')
+    element.send_keys(inputText)
+    context.execute_script(f"arguments[0].value = arguments[1]", element, inputText)
     
     # Send Enter if needed
     if send:

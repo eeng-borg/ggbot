@@ -1,6 +1,5 @@
 from h11 import Data
 from selenium import webdriver
-import undetected_chromedriver as uc
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -53,8 +52,8 @@ sys.excepthook = log_exception
 def __create_driver() -> webdriver.Chrome:
 
     print("Driver created")
-    # chrome_options = Options()
-    chrome_options = uc.ChromeOptions()
+    chrome_options = Options()
+    # chrome_options = uc.ChromeOptions()
 
 
     
@@ -105,7 +104,7 @@ def __create_driver() -> webdriver.Chrome:
 
         
         # create a driver
-        driver = uc.Chrome(service=service, options=chrome_options)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
 
     except Exception as e:
         print(f"Error initializing the Chrome driver: {e}")
