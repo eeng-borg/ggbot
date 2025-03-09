@@ -30,7 +30,7 @@ class Leaderboard:
 
         table = os.getenv('MAIN_TABLE_NAME') # MAIN_TABLE_NAME=korniszons_test
         query = f"SELECT * FROM {table}_with_position"
-        self.leaderboard = self.database.fetch(query, dictionary=True)    
+        self.leaderboard = self.database.fetch(query, dictionary=True) or []
 
             
 
@@ -167,7 +167,7 @@ class Leaderboard:
             
             # from index jest gdzieś -1 robiony sprawdź
 
-            ranking_range = self.database.fetch(query, (from_index, to_index), dictionary=True)
+            ranking_range = self.database.fetch(query, (from_index, to_index), dictionary=True) or []
             # print(f"Range ({from_index}-{to_index}): {ranking_range}")
 
             response = ''

@@ -1,9 +1,7 @@
 from concurrent.futures import thread
-from unittest import mock
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from unittest.mock import MagicMock, patch
 from command_modules.korniszon_module import leaderboard
 from command_modules.korniszon_module.random_korniszon import SpamKorniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
@@ -12,6 +10,7 @@ import os
 import json
 import time
 import threading
+from sql_database import Database
 
 
 def dummy_wait_find_input_and_send_keys(*arg):
@@ -26,7 +25,9 @@ def mock_driver():
 
 @pytest.fixture
 def mock_leaderboard(mock_driver):
-    leaderboard = Leaderboard(mock_driver)
+
+    database = Database()
+    leaderboard = Leaderboard(database=database, driver=mock_driver)
     return leaderboard
 
 
@@ -114,9 +115,15 @@ def test_spamming(mock_random_korniszon: SpamKorniszon, mock_leaderboard: Leader
     thread = threading.Thread(target=mock_random_korniszon._spamming, daemon=True)
     thread.start()
 
-    mock_random_korniszon._spamming()
     time.sleep(2)
-    
+
     assert mock_random_korniszon.spam_time_left == 58
+
+    mock_random_korniszon.keep_spamming = False
+    thread.join(timeout=2)
+
+    # Verify thread has terminated
+    assert not thread.is_alive(), "Thread did not terminate properly"
+
 
 

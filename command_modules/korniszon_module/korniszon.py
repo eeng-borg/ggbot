@@ -166,30 +166,27 @@ class Korniszon:
         else:
             emotka = ""
 
-            if score > 500:
-                emotka = "! :o"
-            elif score > 300:
-                emotka = "! <hura>"
-            elif score > 200:
-                emotka = "! :>"
-            elif score > 150:
-                emotka = ". ;>"
-            elif score == 131.72:
-                emotka = ". :))"
-            elif score > 100:
-                emotka = ". <myśli>"
-            elif score == 21.37:
-                emotka = ". <lol>"
-            elif score > 75:
-                emotka = ".. :/"
-            elif score > 50:
-                emotka = ".. <palacz>"
-            elif score > 0:
-                emotka = "... ;("
-            elif score == 00.10:
-                emotka = "... <leje>"
-            elif score == 0:
-                emotka = "..... <idiota>"
+            if score > 500: emotka = "! :o"
+            elif score > 300: emotka = "! <hura>"
+            elif score > 200: emotka = "! :>"
+            elif score > 150: emotka = ". ;>"
+            elif score == 131.72: emotka = ". :))"
+            elif score > 100: emotka = ". <myśli>"
+            elif score == 21.37: emotka = ". <lol>"
+            elif score > 75: emotka = ".. :/"
+            elif score > 50: emotka = ".. <palacz>"
+            elif score > 0: emotka = "... ;("
+            elif score == 00.10: emotka = "... <leje>"
+            elif score == 0: emotka = "..... <idiota>"
+            elif score > 150: emotka = ". ;>"
+            elif score == 131.72: emotka = ". :))"
+            elif score > 100: emotka = ". <myśli>"
+            elif score == 21.37: emotka = ". <lol>"
+            elif score > 75: emotka = ".. :/"
+            elif score > 50: emotka = ".. <palacz>"
+            elif score > 0: emotka = "... ;("
+            elif score == 00.10: emotka = "... <leje>"
+            elif score == 0: emotka = "..... <idiota>"
 
             response = (f"{korniszon_input} zdobył {score} punktów{emotka}\n"
             f"Zajoł {position} miejsce.")

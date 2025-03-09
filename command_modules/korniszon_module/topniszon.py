@@ -74,6 +74,7 @@ class Topniszon:
                 """
         date_pattern = f"{year_now}-{month_now:02d}-{self.day_input:02d}%"
         print(f"Searching with date pattern: {date_pattern}")
+        
         topek = self.database.fetch(query, params=(date_pattern,), fetch_one=True, dictionary=True)
         
         if topek is None:

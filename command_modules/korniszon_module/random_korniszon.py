@@ -26,7 +26,8 @@ class SpamKorniszon:
         self.spam_time = 30
         self.spam_limit = 0
         self.spam_time_left = 0
-        
+        self.keep_spamming = True # emergence
+
         self.set_spamming_time(quiet=True)
 
 
@@ -34,7 +35,7 @@ class SpamKorniszon:
 
     def _spamming(self):
 
-        while True:
+        while self.keep_spamming:
             time.sleep(1)
             self.spam_time_left -= 1
             # print(f"Time left: {self.spam_time_left}")
