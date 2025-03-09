@@ -27,17 +27,48 @@ class Leaderboard:
 
 
     def load_leaderboard(self):
-
-        table = os.getenv('MAIN_TABLE_NAME') # MAIN_TABLE_NAME=korniszons_test
+        table = os.getenv('MAIN_TABLE_NAME')  # MAIN_TABLE_NAME=korniszons_test
         query = f"SELECT * FROM {table}_with_position"
-        self.leaderboard = self.database.fetch(query, dictionary=True) or []
-
+        database = self.database.fetch(query, dictionary=True) or []
+        
+        for item in database:
+            temp_item = item.copy()
             
-
+            try:
+                # Safely convert datetime to timestamp, regardless of timezone
+                created_dt = item['created']
+                
+                # Check if it's a valid datetime object
+                if not isinstance(created_dt, datetime):
+                    print(f"Warning: 'created' is not a datetime object, it's {type(created_dt)}")
+                    temp_item['created'] = 0
+                else:
+                    # Print details for debugging
+                    print(f"DateTime: {created_dt}, Type: {type(created_dt)}, TZ info: {created_dt.tzinfo}")
+                    
+                    # Make sure it has a timezone if needed
+                    if created_dt.tzinfo is None:
+                        # It's a naive datetime - could be the source of the problem
+                        print("Warning: Datetime has no timezone information")
+                        # Continue with the conversion anyway
+                    
+                    # Try using the total_seconds method on the timedelta instead
+                    epoch = datetime(1970, 1, 1)
+                    if created_dt.tzinfo:
+                        epoch = epoch.replace(tzinfo=created_dt.tzinfo)
+                        
+                    delta = created_dt - epoch
+                    temp_item['created'] = delta.total_seconds()
+                    
+            except Exception as e:
+                print(f"Error handling datetime: {e}, value: {item['created']}")
+                temp_item['created'] = 0
+            
+            self.leaderboard.append(temp_item)
+        
         print(f"leaderboard: {self.leaderboard}")
         return self.leaderboard
-        
-
+            
 
 
 
