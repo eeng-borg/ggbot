@@ -1,3 +1,4 @@
+from concurrent.futures import thread
 from unittest import mock
 import pytest
 from selenium import webdriver
@@ -10,6 +11,7 @@ import tempfile
 import os
 import json
 import time
+import threading
 
 
 def dummy_wait_find_input_and_send_keys(*arg):
@@ -103,14 +105,18 @@ class TestGetSpamTime:
 
 
 
-# def test_spamming(mock_random_korniszon: SpamKorniszon, mock_leaderboard):
+def test_spamming(mock_random_korniszon: SpamKorniszon, mock_leaderboard: Leaderboard):
 
-#     mock_leaderboard.leaderboard = [{'input': 'fgfgfgfg'},{'input': 'aav'},{'input': 'ughmm'},]
+    mock_leaderboard.leaderboard = [{'input': 'fgfgfgfg'},{'input': 'aav'},{'input': 'ughmm'},]
 
-#     mock_random_korniszon.spam_limit = -100
-#     mock_random_korniszon.spam_time = 1
-#     mock_random_korniszon._spamming()
+    mock_random_korniszon.spam_limit = -100
+    mock_random_korniszon.spam_time = 1
+    thread = threading.Thread(target=mock_random_korniszon._spamming, daemon=True)
+    thread.start()
 
-#     assert mock_random_korniszon.spam_time_left == 55
+    mock_random_korniszon._spamming()
+    time.sleep(2)
+    
+    assert mock_random_korniszon.spam_time_left == 58
 
 

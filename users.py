@@ -1,4 +1,3 @@
-import sys
 import threading
 import time
 
@@ -14,7 +13,6 @@ class Cooldown:
         
     # else:
     cooldown_time = 20
-
         
 
     instances = [] # class instances
@@ -31,12 +29,14 @@ class Cooldown:
         
 
     def end(self):
-
         self.on_cooldown = False
+
 
 
     def start(self):
         if not self.on_cooldown:
+            
+            # call self.end after cooldown_time passes to set on_cooldown to false
             self.start_time = time.time()
             timer = threading.Timer(Cooldown.cooldown_time, self.end)
             timer.start() # do not exexutes

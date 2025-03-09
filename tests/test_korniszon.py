@@ -4,7 +4,6 @@ from selenium import webdriver
 from utils.types import CommandData
 from command_modules.korniszon_module.korniszon import Korniszon
 from command_modules.korniszon_module.leaderboard import Leaderboard
-from users import Cooldown
 from sql_database import Database
 
 

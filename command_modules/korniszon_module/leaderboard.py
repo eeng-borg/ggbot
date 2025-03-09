@@ -22,6 +22,7 @@ class Leaderboard:
         self.driver = driver
         self.leaderboard_is_displayed = False
         self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
+        self.load_leaderboard()
 
 
 
@@ -29,7 +30,7 @@ class Leaderboard:
 
         table = os.getenv('MAIN_TABLE_NAME') # MAIN_TABLE_NAME=korniszons_test
         query = f"SELECT * FROM {table}_with_position"
-        self.leaderboard = self.database.fetch(query, dictionary=True)     
+        self.leaderboard = self.database.fetch(query, dictionary=True)    
 
             
 
@@ -167,7 +168,7 @@ class Leaderboard:
             # from index jest gdzieś -1 robiony sprawdź
 
             ranking_range = self.database.fetch(query, (from_index, to_index), dictionary=True)
-            print(f"Range ({from_index}-{to_index}): {ranking_range}")
+            # print(f"Range ({from_index}-{to_index}): {ranking_range}")
 
             response = ''
 

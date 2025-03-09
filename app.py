@@ -2,10 +2,12 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from sql_database import Database
-
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 CORS(app)
+
+load_dotenv()
 
 database = Database()
 leaderboard_obj = Leaderboard(database)

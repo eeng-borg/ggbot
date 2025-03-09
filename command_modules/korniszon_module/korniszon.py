@@ -304,7 +304,8 @@ class Korniszon:
                 
             elif send_results:
                 send_results(score, korniszon_input, position)
-                
+            
+            cooldown.start()
             print(f"Full score: {round(score, 2)}")
 
         

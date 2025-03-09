@@ -26,6 +26,8 @@ class SpamKorniszon:
         self.spam_time = 30
         self.spam_limit = 0
         self.spam_time_left = 0
+        
+        self.set_spamming_time(quiet=True)
 
 
 
@@ -43,7 +45,7 @@ class SpamKorniszon:
                 for a in range(random.randint(1,3)):
 
                     korniszon = random.choice(self.leaderboard.leaderboard)
-                    response = f"{korniszon['input']} "
+                    response += f"{korniszon['input']} "
                 
                 print(f"response: {response}")
                 self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)

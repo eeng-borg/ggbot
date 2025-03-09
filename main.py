@@ -131,16 +131,13 @@ topniszon_command = Command(driver, 'topniszon', "najlepszy korniszon <okularnik
 worstniszon_command = Command(driver, 'worstniszon', "najgorszy korniszon <głupek>. Wybierz dzień obecnego miesiaca, albo wpisz sama komendę żeby pokazać dzisiejszego")
 ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych korniszonów w kosmosie!! Podaj 1-2 numery, aby określić zakres.")
 staty_command = Command(driver, 'staty', "korniszonistyki zawodnika <paker>")
-# restart_command = Command(driver, 'restart', "gdyby się zawiesiło coś, gdzieś")
 strona_command = Command(driver, 'strona', "gg platforma z różnymi ciekawymi rzeczami <chatownik>")
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
 database = Database()
 leaderboard = Leaderboard(database, driver)
 korniszon = Korniszon(database, driver, leaderboard)
-leaderboard.load_leaderboard()
 spam_korniszon = SpamKorniszon(driver, leaderboard)
-spam_korniszon.set_spamming_time(quiet=True)
 topniszon = Topniszon(database, driver)
 
 
@@ -186,8 +183,9 @@ while(True):
                         # look for user who made a command in users list, to check if his cooldown has ended for him
                         cooldown = Cooldown.find_user(data['user'])
                         korniszon.rate_korniszon(data, cooldown)
-                        cooldown.start() # if cooldown is over and rating a korniszon is attempted, turn on the flag again.
-
+                        # cooldown.start() # if cooldown is over and rating a korniszon is attempted, turn on the flag again.
+                        print(f"Cooldown instances: {len(Cooldown.instances)}")
+                        
 
                 spam_commands_data = Command.get_commands_by_type(str(spam_command))
 
