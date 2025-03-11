@@ -1,4 +1,5 @@
 import os
+from time import gmtime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from sql_database import Database
@@ -40,15 +41,18 @@ class Topniszon:
 
 
 
-    def best_korniszon_by_day(self, day_input, best=True, datetime_now=datetime.now()):
+    def best_korniszon_by_day(self, day_input, best=True, datetime_now=None):
 
         self.day_input = day_input
         when = ''
 
+        if datetime_now == None:
+            datetime_now = datetime.now()
+
 
         # check if input is a number, otherwise throw exception message
         when = self._input_to_when(day_input, datetime_now)
-        print(f"Day: {self.day_input}")
+        print(f"Day: {self.day_input}, Datetime_now: {datetime_now}")
 
 
         # so return is always a string
@@ -74,6 +78,7 @@ class Topniszon:
                 """
         date_pattern = f"{year_now}-{month_now:02d}-{self.day_input:02d}%"
         print(f"Searching with date pattern: {date_pattern}")
+        print(f"datetime.now: {datetime.now()}")
         
         topek = self.database.fetch(query, params=(date_pattern,), fetch_one=True, dictionary=True)
         
@@ -98,7 +103,7 @@ class Topniszon:
         user = topek['user']
 
         created_dt = topek['created']
-        hour = created_dt.hour
+        hour = (created_dt.hour + 1) % 24  # Add 1 hour for GMT+1
         minute = created_dt.minute
 
 

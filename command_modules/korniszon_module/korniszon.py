@@ -189,7 +189,7 @@ class Korniszon:
             elif score == 0: emotka = "..... <idiota>"
 
             response = (f"{korniszon_input} zdobył {score} punktów{emotka}\n"
-            f"Zajoł {position} miejsce.")
+            f"Zajął {position} miejsce.")
 
         wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
 

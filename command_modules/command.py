@@ -85,46 +85,50 @@ class Command:
     # look for every command in the chat before clearing it, then put them in the list with all of their data (who posted, what type of command etc.)
     @staticmethod
     def get_commands_data(incoming_messages: List[WebElement]):
-
-        Command.received_commands = [] # clear the list before every search, so it won't add up with old commands
-
-
+        Command.received_commands = []  # Reset commands list
         __user_nickname = ''
 
-        for message in incoming_messages:          
+        # Create a set of command names for faster lookup
+        command_names = {cmd['command_name'] for cmd in Command.command_type_list}
 
-            # if message elements contains user nickname element, it means that the other messages below, without it, belong to the same user
+        for message in incoming_messages:
+            # Get nickname if present
             nickname_element = message.find_elements(By.CLASS_NAME, "ml__item-username")
-
-
             if nickname_element:
-                # Extract and clean the nickname so only string is left
                 __user_nickname = Command.__get_username(nickname_element[0])
 
-            # check for every command saved in type_list
-            for command in Command.command_type_list:
+            # Get message text
+            message_text = message.find_elements(By.CLASS_NAME, "ml__item-part-content")[0].text
+            
+            # Quick check if this could be a command
+            if not message_text.startswith('/'): 
+                continue
 
-                command_name = command['command_name']
-                xpath = Command.__commandXpath(command_name)
-                raw_command_element = message.find_elements(By.XPATH, f".{xpath}")  # Wait until the command is found and make a list of them
-
-                # one of the command is found in this message
-                if raw_command_element:
-
-                    Command.is_any_command_found = True
-
-                    # get input text from raw_command_element[0] and remove command name from it so only input text is left
-                    input = Command.__get_input_text(raw_command_element[0], command_name)
-
-                    # combine all collected data into a dict
-                    command_data = Command.__make_data_dict(__user_nickname, command_name, input)
-                    print(command_data)
-
-                    Command.received_commands.append(command_data)
-                    # print(f"Lista: {Command.received_commands}")
-
-                    break # if command is found in this message, theres not point of checking for others, 
-                            # so we skip to the next message
+            # Extract potential command name
+            parts = message_text.split()
+            if not parts:
+                continue
+                
+            # Remove '/' from potential command
+            potential_cmd = parts[0][1:]
+            
+            # Check if this is a valid command
+            if potential_cmd in command_names:
+                Command.is_any_command_found = True
+                
+                # Get command input (everything after command name)
+                input_text = message_text[len(potential_cmd) + 2:].strip()
+                input_text = filter_bmp(input_text)
+                
+                # Create command data
+                command_data = Command.__make_data_dict(
+                    __user_nickname,
+                    potential_cmd,
+                    input_text
+                )
+                
+                Command.received_commands.append(command_data)
+                print(command_data)
 
 
     # function to check if a specific command type is present in received_cmd list and make list of them

@@ -27,6 +27,9 @@ class Leaderboard:
 
 
     def load_leaderboard(self):
+
+        self.leaderboard =[]
+        
         table = os.getenv('MAIN_TABLE_NAME')  # MAIN_TABLE_NAME=korniszons_test
         query = f"SELECT * FROM {table}_with_position"
         database = self.database.fetch(query, dictionary=True) or []
@@ -44,7 +47,7 @@ class Leaderboard:
                     temp_item['created'] = 0
                 else:
                     # Print details for debugging
-                    print(f"DateTime: {created_dt}, Type: {type(created_dt)}, TZ info: {created_dt.tzinfo}")
+                    # print(f"DateTime: {created_dt}, Type: {type(created_dt)}, TZ info: {created_dt.tzinfo}")
                     
                     # Make sure it has a timezone if needed
                     if created_dt.tzinfo is None:
@@ -54,6 +57,7 @@ class Leaderboard:
                     
                     # Try using the total_seconds method on the timedelta instead
                     epoch = datetime(1970, 1, 1)
+                    
                     if created_dt.tzinfo:
                         epoch = epoch.replace(tzinfo=created_dt.tzinfo)
                         
@@ -66,7 +70,7 @@ class Leaderboard:
             
             self.leaderboard.append(temp_item)
         
-        print(f"leaderboard: {self.leaderboard}")
+        print(f"leaderboard: {len(self.leaderboard)}")
         return self.leaderboard
             
 
