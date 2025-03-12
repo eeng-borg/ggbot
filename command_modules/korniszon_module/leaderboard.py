@@ -101,7 +101,7 @@ class Leaderboard:
         query = f"""
                 SELECT position
                 FROM {table}_with_position
-                WHERE input = %s
+                WHERE LOWER(input) = LOWER(%s)
                 """
 
         position = self.database.fetch(query, (korniszon_input,), fetch_one=True)

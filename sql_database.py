@@ -23,7 +23,8 @@ class Database:
             "database": db_name,
             # Add timeout parameters
             "connection_timeout": 30,
-            "pool_reset_session": True
+            "pool_reset_session": True,
+            "charset": "utf8mb4"
         }
 
         # Create a pool

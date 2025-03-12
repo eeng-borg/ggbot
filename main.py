@@ -151,16 +151,15 @@ while(True):
         incoming_messages = driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
 
         
-        if incoming_messages:
+        if incoming_messages: # zmień na każdą wiadomość, nie tylko przychodzącą
 
             # search for commands in messages and return data of them
             Command.get_commands_data(incoming_messages)
-
+            clear_chat(driver)
             
             # functions called with a command
             if Command.is_any_command_found:
-
-                clear_chat(driver) # clear chat before exec logic, so we can still get commands which were posted during this
+                 # clear chat before exec logic, so we can still get commands which were posted during this
                 
                 binguj_commads_data = Command.get_commands_by_type(str(binguj_command))
 

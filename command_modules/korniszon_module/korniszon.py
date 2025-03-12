@@ -210,18 +210,19 @@ class Korniszon:
         query = f"""
                 SELECT input
                 FROM {table}
-                WHERE input = %s
+                WHERE input COLLATE utf8mb4_bin = %s
                 LIMIT 1
                 """
         
-        result = self.database.fetch(query,(korniszon_input,))        
+        result = self.database.fetch(query,(korniszon_input,))
+        print(f"Query result: {result}")
         exists = bool(result)
 
         # in case if korniszon is already on leaderborad
         if exists:
 
             pozycja = self.leaderboard.get_position(korniszon_input)
-            response = f"{korniszon_input} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
+            response = f"{result[0][0]} już jest na pozycji {pozycja}. Wymyśl nowego korniszona <okok>"
             wait_find_input_and_send_keys(self.driver, 10, By.ID, "chat-text", response)
             return True
         
