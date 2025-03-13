@@ -25,7 +25,7 @@ def get_ranking():
     offset = (page - 1) * per_page
 
     # Load paginated data
-    leaderboard_list = leaderboard_obj.load_leaderboard(offset=offset, per_page=per_page)
+    leaderboard_list = leaderboard_obj.load_leaderboard(offset=offset, limit=per_page)
 
     # Get total count without loading all data
     total_query = f"""

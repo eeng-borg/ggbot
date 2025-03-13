@@ -26,7 +26,7 @@ class Leaderboard:
 
 
 
-    def load_leaderboard(self,  offset=0, per_page=10, whole=False):
+    def load_leaderboard(self,  offset=0, limit=10, whole=False):
 
         _leaderboard = []
 
@@ -40,7 +40,7 @@ class Leaderboard:
         
         if whole == False:
             query += " LIMIT %s OFFSET %s"
-            params = (per_page, offset)
+            params = (limit, offset)
 
         database = self.database.fetch(query, params, dictionary=True) or []
         
@@ -121,14 +121,12 @@ class Leaderboard:
         
 
 
-    
-    # def find_by_name(self, korniszon_text):
-    #     self.leaderboard
-    @staticmethod
-    def _get_range_from_input(data_input) -> Dict:
+    # get offset and limit arguments from command input
+    def _get_range_from_input(self, data_input) -> Dict:
+
         # remove everything except numbers and spaces
-        from_index = 0
-        to_index = 10
+        offset = 1
+        limit = 10
 
         # remove everything exept for numbers and spaces, 
         numbers = "".join([char for char in data_input if char.isdigit() or char.isspace()])
@@ -143,77 +141,82 @@ class Leaderboard:
         print(f"input_list: {len(input_list)}")
 
         try:
-            if len(input_list) >= 2:
-                from_index = int(input_list[0])
-                to_index = int(input_list[1])
+            # if only offset given
+            if len(input_list) > 0:
+                offset_input = int(input_list[0])
 
-            elif len(input_list) == 1:
-                to_index = int(input_list[0])
+                # we later subract -1 from offset, so we don't want to trigger sql error 
+                # which can't have items at -1 index 
+                if offset_input > 0:
+                    offset = int(input_list[0])
+                    limit = 1 # assume we only want one position returned
+
+                else:
+                    response = f"Ranking zaczyna się od 1 <prosi>"
+                    self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+
+
+            # if both
+            if len(input_list) > 1:
+                limit = int(input_list[1])
 
         except ValueError:
-            return {"from_index": from_index, "to_index": to_index}
+            pass
 
-
-        return {"from_index": from_index, "to_index": to_index}
+        # subtract -1 so when asked for offset 5, we start from 5 and not 6
+        return {"offset": offset - 1, "limit": limit}
     
 
     
 
 
-    def _check_if_range_is_too_big(self, from_index, to_index, max_range=30):
+    def _check_if_range_not_too_big(self, limit, max_range=30):
 
+        if limit > max_range:
 
-        index_range = to_index - from_index # 120 - 30 = 90
-        print(f"Kalkuluj: {index_range} = {to_index} - {from_index}")
-
-        if index_range > max_range:
-
-            response = f"Hola komboju <luzik> {index_range} nie dostaniesz, masz 30."
+            response = f"Hola komboju <luzik> {limit} nie dostaniesz, masz 30."
             self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
             time.sleep(1)
-            print(f"to_index: {to_index}")
+            print(f"limit: {limit}")
 
             # shorten the range to match the max_range, by decreasing the end index
-            to_index = to_index - (index_range - max_range)
+            limit = max_range
 
-        return to_index
-
-
+        return limit
 
 
-    def display_leaderboard(self, data_input, get_range_from_input=_get_range_from_input):
+
+
+    def display_leaderboard(self, data_input, get_range_from_input=None):
         
 
         if self.leaderboard_is_displayed == False:
 
             self.leaderboard_is_displayed = True
 
-            from_index = 0
-            to_index = 10
+            offset = 1
+            limit = 10
 
             # if empty command
             if len(data_input) > 0: # input always return string, empty string acts like none
                 # remove everything except numbers and spaces
+                if get_range_from_input == None:
+                    get_range_from_input = self._get_range_from_input
+                    
+
                 range_dict = get_range_from_input(data_input)
-                from_index = range_dict["from_index"]
-                to_index = range_dict["to_index"]
+                offset = range_dict["offset"]
+                limit = range_dict["limit"]
 
             
             # check if range not too big, to avoid spamming with 1k long ranking lists
             # if it is - subtract the end range value
-            to_index = self._check_if_range_is_too_big(from_index, to_index)
+            limit = self._check_if_range_not_too_big(limit)
 
-            table = os.getenv('MAIN_TABLE_NAME') # MAIN_TABLE_NAME=korniszons_test
-            query = f"""
-                    SELECT * 
-                    FROM {table}_with_position
-                    WHERE position BETWEEN %s AND %s
-                    """
-            
+                       
             # from index jest gdzieś -1 robiony sprawdź
 
-            ranking_range = self.database.fetch(query, (from_index, to_index), dictionary=True) or []
-            # print(f"Range ({from_index}-{to_index}): {ranking_range}")
+            ranking_range = self.load_leaderboard(offset=offset, limit=limit)
 
             response = ''
 
