@@ -45,7 +45,7 @@ class SpamKorniszon:
                 response = ''        
                 for a in range(random.randint(1,3)):
 
-                    korniszon = random.choice(self.leaderboard.leaderboard)
+                    korniszon = random.choice(self.leaderboard.leaderboard) # query zamiast liderborda
                     response += f"{korniszon['input']} "
                 
                 print(f"response: {response}")

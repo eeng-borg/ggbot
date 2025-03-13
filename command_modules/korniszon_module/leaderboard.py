@@ -22,17 +22,27 @@ class Leaderboard:
         self.driver = driver
         self.leaderboard_is_displayed = False
         self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
-        self.load_leaderboard()
+        # self.load_leaderboard()
 
 
 
-    def load_leaderboard(self):
+    def load_leaderboard(self,  offset=0, per_page=10, whole=False):
 
-        self.leaderboard =[]
+        _leaderboard = []
+
         
         table = os.getenv('MAIN_TABLE_NAME')  # MAIN_TABLE_NAME=korniszons_test
-        query = f"SELECT * FROM {table}_with_position"
-        database = self.database.fetch(query, dictionary=True) or []
+        
+        query = f"""SELECT * 
+                FROM {table}_with_position"""
+        
+        params = None
+        
+        if whole == False:
+            query += " LIMIT %s OFFSET %s"
+            params = (per_page, offset)
+
+        database = self.database.fetch(query, params, dictionary=True) or []
         
         for item in database:
             temp_item = item.copy()
@@ -68,10 +78,10 @@ class Leaderboard:
                 print(f"Error handling datetime: {e}, value: {item['created']}")
                 temp_item['created'] = 0
             
-            self.leaderboard.append(temp_item)
+            _leaderboard.append(temp_item)
         
-        print(f"leaderboard: {len(self.leaderboard)}")
-        return self.leaderboard
+        print(f"leaderboard: {len(_leaderboard)}")
+        return _leaderboard
             
 
 
@@ -101,7 +111,7 @@ class Leaderboard:
         query = f"""
                 SELECT position
                 FROM {table}_with_position
-                WHERE LOWER(input) = LOWER(%s)
+                WHERE input COLLATE utf8mb4_bin = %s
                 """
 
         position = self.database.fetch(query, (korniszon_input,), fetch_one=True)
@@ -181,7 +191,7 @@ class Leaderboard:
             from_index = 0
             to_index = 10
 
-
+            # if empty command
             if len(data_input) > 0: # input always return string, empty string acts like none
                 # remove everything except numbers and spaces
                 range_dict = get_range_from_input(data_input)
