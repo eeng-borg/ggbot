@@ -81,6 +81,7 @@ class Leaderboard:
             _leaderboard.append(temp_item)
         
         print(f"leaderboard: {len(_leaderboard)}")
+        self.leaderboard = _leaderboard
         return _leaderboard
             
 

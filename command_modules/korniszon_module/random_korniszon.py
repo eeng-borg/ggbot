@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from datetime import datetime
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from utils.utilities import wait_find_input_and_send_keys
+from sql_database import Database
 import random
 import time
 import threading
@@ -14,8 +15,9 @@ import os
 class SpamKorniszon:
 
 
-    def __init__(self, driver: webdriver.Chrome, leaderboard: Leaderboard, wait_find_input_and_send_keys=wait_find_input_and_send_keys) -> None:
+    def __init__(self, database: Database, driver: webdriver.Chrome, leaderboard: Leaderboard, wait_find_input_and_send_keys=wait_find_input_and_send_keys) -> None:
         
+        self.database = database
         self.driver = driver
         self.leaderboard = leaderboard
         self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
@@ -36,20 +38,29 @@ class SpamKorniszon:
     def _spamming(self):
 
         while self.keep_spamming:
+
             time.sleep(1)
             self.spam_time_left -= 1
             # print(f"Time left: {self.spam_time_left}")
 
             if self.spam_time_left < 0:
 
-                response = ''        
-                for a in range(random.randint(1,3)):
-
-                    korniszon = random.choice(self.leaderboard.leaderboard) # query zamiast liderborda
-                    response += f"{korniszon['input']} "
+                count = random.randint(1, 3)
+                query = f"""
+                    SELECT input 
+                    FROM (
+                        SELECT input
+                        FROM korniszons_test 
+                        ORDER BY RAND()
+                        LIMIT {count}
+                    ) t
+                """
+                results = self.database.fetch(query) or []
+                response = ' '.join(result[0] for result in results)
                 
                 print(f"response: {response}")
                 self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)
+                
                 self.spam_time_left = self.spam_time
 
 

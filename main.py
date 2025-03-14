@@ -136,8 +136,9 @@ help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro ju
 
 database = Database()
 leaderboard = Leaderboard(database, driver)
+leaderboard.load_leaderboard(whole=True)
 korniszon = Korniszon(database, driver, leaderboard)
-spam_korniszon = SpamKorniszon(driver, leaderboard)
+spam_korniszon = SpamKorniszon(database, driver, leaderboard)
 topniszon = Topniszon(database, driver)
 
 

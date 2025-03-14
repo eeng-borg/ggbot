@@ -11,35 +11,45 @@ class Database:
         self.register_cleanup()
 
     def _create_pool(self):
-        db_host = os.getenv('DB_HOST')
-        db_user = os.getenv('DB_USERNAME')
-        db_password = os.getenv('DB_PASSWORD')
-        db_name = os.getenv('DB_NAME')
-
-        dbconfig = {
-            "host": db_host,
-            "user": db_user,
-            "password": db_password,
-            "database": db_name,
-            # Add timeout parameters
-            "connection_timeout": 30,
-            "pool_reset_session": True,
-            "charset": "utf8mb4"
-        }
-
-        # Create a pool
         try:
+            # Load credentials from environment variables
+            db_host = os.getenv('DB_HOST')
+            db_user = os.getenv('DB_USERNAME')
+            db_password = os.getenv('DB_PASSWORD')
+            db_name = os.getenv('DB_NAME')
+
+            # Validate environment variables
+            if not all([db_host, db_user, db_password, db_name]):
+                raise ValueError("Missing required database environment variables")
+
+            dbconfig = {
+                "host": db_host,
+                "user": db_user,
+                "password": db_password,
+                "database": db_name,
+                "connection_timeout": 30,
+                "pool_reset_session": True,
+                "charset": "utf8mb4"
+            }
+
             self.pool = pooling.MySQLConnectionPool(
                 pool_name="mypool", 
-                pool_size=5,  # Increased pool size
+                pool_size=5,
                 **dbconfig
             )
             print("Database pool created successfully")
+
+        except errors.ProgrammingError as e:
+            if "Access denied" in str(e):
+                print(f"Authentication failed: Please check your username and password")
+                print(f"Error details: {e}")
+            else:
+                print(f"Database configuration error: {e}")
+            raise  # Re-raise the exception instead of sys.exit()
+            
         except Exception as e:
-            print(f"Error creating connection pool: {e}")
-            sys.exit(1)
-
-
+            print(f"Error creating connection pool: {type(e).__name__}: {e}")
+            raise  # Re-raise the exception instead of sys.exit()
 
     def _get_connection(self):
         """Get a connection from the pool with retry logic"""
@@ -63,8 +73,6 @@ class Database:
                 else:
                     print("All connection attempts failed")
                     return None  # Explicitly return None after all retries
-
-
 
     def fetch(self, query, params=None, dictionary=False, fetch_one=False):
         
@@ -106,8 +114,6 @@ class Database:
             if connection:
                 connection.close()  # Return connection to pool
 
-
-
     def commit(self, query, params=None):
         connection = None
         try:
@@ -126,14 +132,10 @@ class Database:
             if connection:
                 connection.close()  # Return connection to pool
 
-
-
     def _cleanup(self, signal_received=None, frame=None):
         print("Cleaning up database resources...")
         # No need to close individual connections as they're managed by the pool
         sys.exit(0)
-
-
 
     def register_cleanup(self):
         signal.signal(signal.SIGINT, self._cleanup)
