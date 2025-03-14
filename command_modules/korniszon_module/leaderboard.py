@@ -81,8 +81,19 @@ class Leaderboard:
             _leaderboard.append(temp_item)
         
         print(f"leaderboard: {len(_leaderboard)}")
-        self.leaderboard = _leaderboard
+        # self.leaderboard = _leaderboard
         return _leaderboard
+    
+
+
+    def load_leaderboard_whole(self):
+        table = os.getenv('MAIN_TABLE_NAME')
+        query = f"""SELECT * 
+                    FROM {table}_with_position"""
+        
+        database = self.database.fetch(query, dictionary=True) or []
+
+        self.leaderboard = database
             
 
 
