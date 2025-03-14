@@ -127,7 +127,7 @@ class Leaderboard:
 
         # remove everything except numbers and spaces
         offset = 1
-        limit = 9
+        limit = 10
 
         # remove everything exept for numbers and spaces, 
         numbers = "".join([char for char in data_input if char.isdigit() or char.isspace()])
@@ -196,7 +196,7 @@ class Leaderboard:
             self.leaderboard_is_displayed = True
 
             offset = 0
-            limit = 9
+            limit = 10
 
             # if empty command
             if len(data_input) > 0: # input always return string, empty string acts like none
