@@ -1,3 +1,4 @@
+import string
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from command_modules.korniszon_module.leaderboard import Leaderboard
@@ -14,15 +15,17 @@ database = Database()
 leaderboard_obj = Leaderboard(database)
 # print(leaderboard_list)
 
-
+# /ranking?page=2&per_page=10
 @app.route('/ranking', methods=['GET'])
 def get_ranking():
-
-    # Get pagination parameters from request
-    page = request.args.get('page', 1, type=int)
+    # Get pagination parameters from request, default page is 0
+    page = request.args.get('page', 0, type=int)
     per_page = request.args.get('per_page', 10, type=int)
+    sort = request.args.get('sort', "score", type=str)
+    filter = request.args.get('filter', "score", type=str)
 
-    offset = (page - 1) * per_page
+    # Calculate offset based on 0-indexed page
+    offset = page * per_page
 
     # Load paginated data
     leaderboard_list = leaderboard_obj.load_leaderboard(offset=offset, limit=per_page)
@@ -36,6 +39,7 @@ def get_ranking():
     # in case database is empty
     total_items = database.fetch(total_query, fetch_one=True) or 0
     
+    # Calculate total pages (0-based)
     total_pages = (total_items + per_page - 1) // per_page
 
     return jsonify({

@@ -103,7 +103,7 @@ class Topniszon:
         user = topek['user']
 
         created_dt = topek['created']
-        hour = (created_dt.hour + 1) % 24  # Add 1 hour for GMT+1
+        hour = created_dt.hour % 24  # Add 1 hour for GMT+1
         minute = created_dt.minute
 
 
