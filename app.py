@@ -4,7 +4,9 @@ from flask_cors import CORS
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from sql_database import Database
 from dotenv import load_dotenv
+from werkzeug.exceptions import HTTPException
 import os
+
 
 app = Flask(__name__)
 CORS(app)
@@ -15,20 +17,26 @@ database = Database()
 leaderboard_obj = Leaderboard(database)
 # print(leaderboard_list)
 
-# /ranking?page=2&per_page=10
+# http://127.0.0.1:8000/ranking?page=0&per_page=10&sort_by=user&order=DESC
 @app.route('/ranking', methods=['GET'])
 def get_ranking():
     # Get pagination parameters from request, default page is 0
     page = request.args.get('page', 0, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    sort = request.args.get('sort', "score", type=str)
-    filter = request.args.get('filter', "score", type=str)
+    sort_by = request.args.get('sort_by', "score", type=str)
+    order = request.args.get('order', "DESC", type=str)
+    # filter = request.args.get('filter', "score", type=str)
 
     # Calculate offset based on 0-indexed page
     offset = page * per_page
 
     # Load paginated data
-    leaderboard_list = leaderboard_obj.load_leaderboard(offset=offset, limit=per_page)
+    leaderboard_list = leaderboard_obj.load_leaderboard(
+        offset=offset, 
+        limit=per_page,
+        sort_by=sort_by,
+        order=order
+        )
 
     # Get total count without loading all data
     total_query = f"""
@@ -51,6 +59,7 @@ def get_ranking():
         },
         'items': leaderboard_list
     })
+
 
 
 

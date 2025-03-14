@@ -8,6 +8,7 @@ from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from typing import Dict, Optional
+from werkzeug.exceptions import HTTPException
 
 
 # korniszon leaderboard
@@ -26,15 +27,32 @@ class Leaderboard:
 
 
 
-    def load_leaderboard(self,  offset=0, limit=10, whole=False):
+    def load_leaderboard(self,  offset=0, limit=10, sort_by='score', order='DESC', whole=False):
 
         _leaderboard = []
 
         
         table = os.getenv('MAIN_TABLE_NAME')  # MAIN_TABLE_NAME=korniszons_test
+
+        # Validate order parameter
+        order = order.upper() if order.upper() in ['ASC', 'DESC'] else 'DESC'
+
+        # Validate sort_by parameter - map frontend names to database columns
+        valid_columns = {
+            'score': 'score',
+            'user': 'user',
+            'input': 'input',
+            'created': 'created',
+            'position': 'position'
+        }
+        
+        # Default to score if invalid column name provided
+        sort_by = valid_columns.get(sort_by.lower(), 'score')
         
         query = f"""SELECT * 
-                FROM {table}_with_position"""
+                FROM {table}_with_position
+                ORDER BY {sort_by} {order}, score DESC"""
+                
         
         params = None
         
@@ -48,40 +66,30 @@ class Leaderboard:
             temp_item = item.copy()
             
             try:
-                # Safely convert datetime to timestamp, regardless of timezone
                 created_dt = item['created']
-                
-                # Check if it's a valid datetime object
-                if not isinstance(created_dt, datetime):
-                    print(f"Warning: 'created' is not a datetime object, it's {type(created_dt)}")
-                    temp_item['created'] = 0
+                if isinstance(created_dt, datetime):
+
+                    # Convert datetime to Unix timestamp (seconds since epoch)
+                    temp_item['created'] = created_dt.timestamp()
+
                 else:
-                    # Print details for debugging
-                    # print(f"DateTime: {created_dt}, Type: {type(created_dt)}, TZ info: {created_dt.tzinfo}")
-                    
-                    # Make sure it has a timezone if needed
-                    if created_dt.tzinfo is None:
-                        # It's a naive datetime - could be the source of the problem
-                        print("Warning: Datetime has no timezone information")
-                        # Continue with the conversion anyway
-                    
-                    # Try using the total_seconds method on the timedelta instead
-                    epoch = datetime(1970, 1, 1)
-                    
-                    if created_dt.tzinfo:
-                        epoch = epoch.replace(tzinfo=created_dt.tzinfo)
+
+                    print(f"Warning: 'created' is not a datetime object, it's {type(created_dt)}")
+                    # Try to parse it as datetime if it's a string
+                    if isinstance(created_dt, str):
+
+                        parsed_dt = datetime.strptime(created_dt, "%Y-%m-%d %H:%M:%S")
+                        temp_item['created'] = parsed_dt.timestamp()
+                    else:
+
+                        temp_item['created'] = 0
                         
-                    delta = created_dt - epoch
-                    temp_item['created'] = delta.total_seconds()
-                    
             except Exception as e:
                 print(f"Error handling datetime: {e}, value: {item['created']}")
                 temp_item['created'] = 0
             
             _leaderboard.append(temp_item)
         
-        print(f"leaderboard: {len(_leaderboard)}")
-        # self.leaderboard = _leaderboard
         return _leaderboard
     
 
