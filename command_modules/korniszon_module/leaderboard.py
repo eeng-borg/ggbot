@@ -19,7 +19,7 @@ class Leaderboard:
 
     def __init__(self, database: Database, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
         self.database = database
-        self.leaderboard = []
+        self.leaderboard = self.load_leaderboard(whole=True)
         self.driver = driver
         self.leaderboard_is_displayed = False
         self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
@@ -27,17 +27,13 @@ class Leaderboard:
 
 
 
-    def load_leaderboard(self,  offset=0, limit=10, sort_by='score', order='DESC', whole=False):
-
-        _leaderboard = []
-
+    def load_leaderboard(self, offset=0, limit=10, sort_by='score', order='DESC', filter_by=None, filter_where='input', whole=False):
+        table = os.getenv('MAIN_TABLE_NAME')
         
-        table = os.getenv('MAIN_TABLE_NAME')  # MAIN_TABLE_NAME=korniszons_test
-
         # Validate order parameter
         order = order.upper() if order.upper() in ['ASC', 'DESC'] else 'DESC'
-
-        # Validate sort_by parameter - map frontend names to database columns
+        
+        # Validate sort_by parameter
         valid_columns = {
             'score': 'score',
             'user': 'user',
@@ -45,23 +41,35 @@ class Leaderboard:
             'created': 'created',
             'position': 'position'
         }
-        
-        # Default to score if invalid column name provided
         sort_by = valid_columns.get(sort_by.lower(), 'score')
         
-        query = f"""SELECT * 
-                FROM {table}_with_position
-                ORDER BY {sort_by} {order}, score DESC"""
-                
+        # Build base query
+        query = f"""
+            SELECT * 
+            FROM {table}_with_position
+        """
         
-        params = None
+        # Initialize params list
+        params = []
         
-        if whole == False:
+        # Add WHERE clause if filter is provided
+        if filter_by:
+            query += " WHERE `{}` LIKE %s".format(filter_where)
+            params.append(f"%{filter_by}%")
+        
+        # Add ORDER BY clause
+        query += f" ORDER BY `{sort_by}` {order}, score DESC"
+        
+        # Add LIMIT and OFFSET if not whole dataset
+        if not whole:
             query += " LIMIT %s OFFSET %s"
-            params = (limit, offset)
-
-        database = self.database.fetch(query, params, dictionary=True) or []
+            params.extend([limit, offset])
         
+        # Execute query with tuple of params
+        database = self.database.fetch(query, tuple(params) if params else None, dictionary=True) or []
+        
+        _leaderboard = []
+
         for item in database:
             temp_item = item.copy()
             
@@ -91,17 +99,6 @@ class Leaderboard:
             _leaderboard.append(temp_item)
         
         return _leaderboard
-    
-
-
-    def load_leaderboard_whole(self):
-        table = os.getenv('MAIN_TABLE_NAME')
-        query = f"""SELECT * 
-                    FROM {table}_with_position"""
-        
-        database = self.database.fetch(query, dictionary=True) or []
-
-        self.leaderboard = database
             
 
 
