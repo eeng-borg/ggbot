@@ -43,14 +43,16 @@ class SpamKorniszon:
             self.spam_time_left -= 1
             # print(f"Time left: {self.spam_time_left}")
 
+            table = os.getenv('MAIN_TABLE_NAME') 
+
             if self.spam_time_left < 0:
 
                 count = random.randint(1, 3)
                 query = f"""
-                    SELECT input 
+                    SELECT input
                     FROM (
                         SELECT input
-                        FROM korniszons_test 
+                        FROM {table} 
                         ORDER BY RAND()
                         LIMIT {count}
                     ) t
