@@ -15,6 +15,7 @@ __pycache__/
 .pydevproject
 .log
 .png
+.sql
 
 main.spec
 pomysły_todo
@@ -27,3 +28,4 @@ settings.json
 
 
 
+Cloud VM MySQL Test.session.sql

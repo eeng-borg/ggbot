@@ -141,13 +141,19 @@ korniszon = Korniszon(database, driver, leaderboard)
 spam_korniszon = SpamKorniszon(database, driver, leaderboard)
 topniszon = Topniszon(database, driver)
 
-
+try:
+    spam_korniszon.set_spamming_time(quiet=True)
+except:
+    print("Spam not working")
+    pass
 
 # main loop for bot operations
 while(True):
 
     # try to catch exceptions if command is found
     try:
+        
+
         # Only incoming messages, so the bot can ignore itself (outgoing messages)
         incoming_messages = driver.find_elements(By.CLASS_NAME, "ml__item--incoming")
 

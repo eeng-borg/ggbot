@@ -30,7 +30,7 @@ class SpamKorniszon:
         self.spam_time_left = 0
         self.keep_spamming = True # emergence
 
-        self.set_spamming_time(quiet=True)
+        # self.set_spamming_time(quiet=True)
 
 
 
@@ -43,21 +43,19 @@ class SpamKorniszon:
             self.spam_time_left -= 1
             # print(f"Time left: {self.spam_time_left}")
 
-            table = os.getenv('MAIN_TABLE_NAME') 
+            table = os.getenv('MAIN_TABLE_NAME')
 
             if self.spam_time_left < 0:
 
                 count = random.randint(1, 3)
                 query = f"""
-                    SELECT input
-                    FROM (
                         SELECT input
-                        FROM {table} 
+                        FROM {table}_with_position
                         ORDER BY RAND()
                         LIMIT {count}
-                    ) t
-                """
+                        """
                 results = self.database.fetch(query) or []
+                print(f"Spam: {results}")
                 response = ' '.join(result[0] for result in results)
                 
                 print(f"response: {response}")
@@ -84,7 +82,6 @@ class SpamKorniszon:
     def _get_spam_time(self, file_name, input):
 
         with open(file_name, 'r', encoding='utf-8') as f:
-
             settings_json = json.load(f)
 
         if input == None:
