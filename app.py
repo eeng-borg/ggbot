@@ -38,9 +38,9 @@ def get_ranking():
     # Get pagination parameters from request, default page is 0
     page = request.args.get('page', 0, type=int)
     per_page = request.args.get('per_page', 10, type=int)
-    sort_by = request.args.get('sort_by', "score", type=str)
+    sort_by = request.args.get('sort_by', "score", type=str or list)
     order = request.args.get('order', "DESC", type=str)
-    filter_by = request.args.get('filter_by', None, type=str)
+    filter_by = request.args.get('filter_by', None, type=str or list)
     filter_where = request.args.get('filter_where', "input", type=str)
 
     # Calculate offset based on 0-indexed page
@@ -65,15 +65,17 @@ def get_ranking():
 
     return jsonify({
         'settings': {
-            'current_page': page,
-            'per_page': per_page,
-            'total_items': total_items,
-            'total_pages': total_pages,
             'sort_by': sort_by,
             'order': order,
             'filter_by': filter_by,
             'filter_where': filter_where
             
+        },
+        'pagination': {
+            'current_page': page,
+            'per_page': per_page,
+            'total_items': total_items,
+            'total_pages': total_pages,            
         },
         'items': leaderboard_list
     })

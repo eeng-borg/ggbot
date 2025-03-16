@@ -1,7 +1,6 @@
 from sql_database import Database
 from utils.utilities import wait_find_input_and_send_keys
 from utils.types import CommandData
-import json
 import os
 import time
 from datetime import datetime
@@ -9,6 +8,7 @@ from selenium.webdriver.common.by import By
 from selenium import webdriver
 from typing import Dict, Optional
 from werkzeug.exceptions import HTTPException
+
 
 
 # korniszon leaderboard
@@ -30,8 +30,6 @@ class Leaderboard:
     def load_leaderboard(self, offset=0, limit=10, sort_by='score', order='DESC', filter_by=None, filter_where='input', whole=False):
         table = os.getenv('MAIN_TABLE_NAME')
         
-        # Validate order parameter
-        order = order.upper() if order.upper() in ['ASC', 'DESC'] else 'DESC'
         
         # Validate sort_by parameter
         valid_columns = {
@@ -42,14 +40,16 @@ class Leaderboard:
             'position': 'position'
         }
 
+        # Validate parameters
+        order = order.upper() if order.upper() in ['ASC', 'DESC'] else 'DESC'
         sort_by = valid_columns.get(sort_by.lower(), 'score')
         filter_where = valid_columns.get(filter_where.lower(), 'input')
         
         # Build base query
         query = f"""
-            SELECT * 
+            SELECT *
             FROM {table}_with_position
-        """
+                """
         
         # Initialize params list
         params = []
@@ -330,6 +330,8 @@ class Leaderboard:
     # user functions
     def display_user_stats(self, data: CommandData):
         
+        self.leaderboard = self.load_leaderboard(whole=True)
+
         user = ''
 
         if data.get('input') == '':
