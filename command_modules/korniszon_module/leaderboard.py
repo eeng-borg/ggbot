@@ -41,7 +41,9 @@ class Leaderboard:
             'created': 'created',
             'position': 'position'
         }
+
         sort_by = valid_columns.get(sort_by.lower(), 'score')
+        filter_where = valid_columns.get(filter_where.lower(), 'input')
         
         # Build base query
         query = f"""

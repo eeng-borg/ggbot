@@ -32,7 +32,7 @@ def _get_total_items():
 
 
 
-# http://127.0.0.1:8000/ranking?page=0&per_page=10&sort_by=user&order=DESC&filter_by=m
+# http://127.0.0.1:8000/ranking?page=0&per_page=10&sort_by=user&order=DESC&filter_by=m&filter_where=fg
 @app.route('/ranking', methods=['GET'])
 def get_ranking():
     # Get pagination parameters from request, default page is 0
