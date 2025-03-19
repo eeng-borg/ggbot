@@ -8,6 +8,7 @@ import platform
 import threading
 from dotenv import load_dotenv, find_dotenv
 from selenium.common.exceptions import TimeoutException
+from command_modules.korniszon_module.spamnij import Spamnij
 from utils.utilities import wait_find_input_and_send_keys, clear_chat
 from innit_bot import innit_bot
 from sql_database import Database
@@ -127,6 +128,7 @@ binguj_command = Command(driver, 'binguj', "wpisz prompty na obrazek jaki chcesz
 bingus_gpt_command = Command(driver, 'bingus', "zapytaj się bingusa o cokolwiek, może pomoże ;>")
 korniszon_command = Command(driver, 'korniszon', "pokaż swojego korniszona, ocenimy uczciwie ;))")
 spam_command = Command(driver, 'spam', "co ile sekund ma spamować korniszonami <chatownik>") 
+spamnij_command = Command(driver, 'spamnij', "Dupnij sobie spamniszona <luzik>. Wybierz ile, jak długie i czy z emotkami - 'emota'")
 topniszon_command = Command(driver, 'topniszon', "najlepszy korniszon <okularnik>. Wybierz dzień obecnego miesiaca, albo wpisz sama komendę żeby pokazać dzisiejszego")
 worstniszon_command = Command(driver, 'worstniszon', "najgorszy korniszon <głupek>. Wybierz dzień obecnego miesiaca, albo wpisz sama komendę żeby pokazać dzisiejszego")
 ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych korniszonów w kosmosie!! Podaj pierwszą pozycję i ile ma pokazać żeby określić zakres.")
@@ -139,6 +141,7 @@ leaderboard = Leaderboard(database, driver)
 # leaderboard.load_leaderboard_whole()
 korniszon = Korniszon(database, driver, leaderboard)
 spam_korniszon = SpamKorniszon(database, driver, leaderboard)
+spamnij = Spamnij(database=database, driver=driver)
 topniszon = Topniszon(database, driver)
 
 try:
@@ -198,6 +201,13 @@ while(True):
                 if spam_commands_data:
                     for data in spam_commands_data:
                         spam_korniszon.set_spamming_time(input=data['input'])
+
+
+                spamnij_commands_data = Command.get_commands_by_type(str(spamnij_command))
+
+                if spamnij_commands_data:
+                    for data in spamnij_commands_data:
+                        spamnij.spam_on_command(input=data['input'])
 
 
                 topniszon_commands_data = Command.get_commands_by_type(str(topniszon_command))

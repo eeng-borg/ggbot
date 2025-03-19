@@ -7,7 +7,6 @@ from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from typing import Dict, Optional
-from werkzeug.exceptions import HTTPException
 
 
 
@@ -56,11 +55,11 @@ class Leaderboard:
         
         # Add WHERE clause if filter is provided
         if filter_by:
-            query += " WHERE `{}` LIKE %s".format(filter_where)
-            params.append(f"%{filter_by}%")
+            query += " WHERE `{}` REGEXP %s".format(filter_where)
+            params.append(f"{filter_by}")
         
         # Add ORDER BY clause
-        query += f" ORDER BY `{sort_by}` {order}, score DESC"
+        query += f" ORDER BY `{sort_by}` {order}, score DESC, created ASC"
         
         # Add LIMIT and OFFSET if not whole dataset
         if not whole:

@@ -7,12 +7,6 @@ class UserNotFoundError(Exception):
 
 
 class Cooldown:
-
-    # if len(sys.argv) > 1 and :
-    #     cooldown_time = int(sys.argv[1])
-        
-    # else:
-    cooldown_time = 20
         
 
     instances = [] # class instances
@@ -24,6 +18,8 @@ class Cooldown:
         # Cooldown.users.append(name)
         self.on_cooldown = False
         self.start_time = 0
+        self.cooldown_time = 15
+
         Cooldown.instances.append(self)
 
         
@@ -38,7 +34,7 @@ class Cooldown:
             
             # call self.end after cooldown_time passes to set on_cooldown to false
             self.start_time = time.time()
-            timer = threading.Timer(Cooldown.cooldown_time, self.end)
+            timer = threading.Timer(self.cooldown_time, self.end)
             timer.start() # do not exexutes
 
             self.on_cooldown = True
