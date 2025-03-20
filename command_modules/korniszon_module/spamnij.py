@@ -92,7 +92,7 @@ class Spamnij():
                 LIMIT {self.lenght}
                 """
         
-        if self.quantity < quantity_limit and self.lenght < lenght_limit:
+        if self.quantity <= quantity_limit and self.lenght <= lenght_limit:
             for i in range(self.quantity):
 
                 results = self.database.fetch(query) or []
