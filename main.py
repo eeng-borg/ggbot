@@ -128,7 +128,7 @@ binguj_command = Command(driver, 'binguj', "wpisz prompty na obrazek jaki chcesz
 bingus_gpt_command = Command(driver, 'bingus', "zapytaj się bingusa o cokolwiek, może pomoże ;>")
 korniszon_command = Command(driver, 'korniszon', "pokaż swojego korniszona, ocenimy uczciwie ;))")
 spam_command = Command(driver, 'spam', "co ile sekund ma spamować korniszonami <chatownik>") 
-spamnij_command = Command(driver, 'spamnij', "Dupnij sobie spamniszona <luzik>. Wybierz ile, jak długie i czy z emotkami - 'emota'")
+spamnij_command = Command(driver, 'spamnij', "Dupnij sobie spamniszona <luzik>. Wybierz ile, jak długie i czy z emotkami - 'emotka'")
 topniszon_command = Command(driver, 'topniszon', "najlepszy korniszon <okularnik>. Wybierz dzień obecnego miesiaca, albo wpisz sama komendę żeby pokazać dzisiejszego")
 worstniszon_command = Command(driver, 'worstniszon', "najgorszy korniszon <głupek>. Wybierz dzień obecnego miesiaca, albo wpisz sama komendę żeby pokazać dzisiejszego")
 ranking_command = Command(driver, 'ranking', "ranking najpotężniejszych korniszonów w kosmosie!! Podaj pierwszą pozycję i ile ma pokazać żeby określić zakres.")
@@ -137,17 +137,17 @@ strona_command = Command(driver, 'strona', "gg platforma z różnymi ciekawymi r
 help_command = Command(driver, 'help', "pokazuje wszystkie komendy, ale skoro już tu jesteś to wiesz co robi :]")
 
 database = Database()
-leaderboard = Leaderboard(database, driver)
+leaderboard = Leaderboard(database=database, driver=driver)
 # leaderboard.load_leaderboard_whole()
-korniszon = Korniszon(database, driver, leaderboard)
-spam_korniszon = SpamKorniszon(database, driver, leaderboard)
+korniszon = Korniszon(database=database, driver=driver, leaderboard=leaderboard)
+spam_korniszon = SpamKorniszon(database=database, driver=driver, leaderboard=leaderboard)
 spamnij = Spamnij(database=database, driver=driver)
-topniszon = Topniszon(database, driver)
+topniszon = Topniszon(database=database, driver=driver, leaderboard=leaderboard)
 
 try:
     spam_korniszon.set_spamming_time(quiet=True)
-except:
-    print("Spam not working")
+except Exception as e:
+    print(f"Spam not working: {e}")
     pass
 
 # main loop for bot operations

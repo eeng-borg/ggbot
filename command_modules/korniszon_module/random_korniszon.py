@@ -1,3 +1,4 @@
+from typing import Optional
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from datetime import datetime
@@ -15,7 +16,7 @@ import os
 class SpamKorniszon:
 
 
-    def __init__(self, database: Database, driver: webdriver.Chrome, leaderboard: Leaderboard, wait_find_input_and_send_keys=wait_find_input_and_send_keys) -> None:
+    def __init__(self, database: Database, leaderboard: Leaderboard, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys) -> None:
         
         self.database = database
         self.driver = driver
@@ -25,9 +26,9 @@ class SpamKorniszon:
         self.thread = None
         self.stop_event = threading.Event()
 
-        self.spam_time = 30
+        self.spam_time = 30 * 60
         self.spam_limit = 0
-        self.spam_time_left = 0
+        self.spam_time_left = self.spam_time
         self.keep_spamming = True # emergence
 
         # self.set_spamming_time(quiet=True)
@@ -41,16 +42,16 @@ class SpamKorniszon:
 
             time.sleep(1)
             self.spam_time_left -= 1
-            # print(f"Time left: {self.spam_time_left}")
+            # print(f"spam_time_left: {self.spam_time_left}")
 
             table = os.getenv('MAIN_TABLE_NAME')
 
-            if self.spam_time_left < 0:
+            if self.spam_time_left <= 0:
 
                 count = random.randint(1, 3)
                 query = f"""
                         SELECT input
-                        FROM {table}_with_position
+                        FROM {table}
                         ORDER BY RAND()
                         LIMIT {count}
                         """

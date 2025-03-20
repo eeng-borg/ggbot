@@ -14,12 +14,20 @@ def dummy_wait_find_input_and_send_keys(*args):
     pass
 
 
+@pytest.fixture(scope='module')
+def mock_leaderboard(mock_leaderboard_list):
+    database = Database()
+    leaderboard = Leaderboard(database, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+    leaderboard.leaderboard = mock_leaderboard_list
+    return leaderboard
+
+
 
 @pytest.fixture(scope='module')
-def mock_topniszon():
+def mock_topniszon(mock_leaderboard):
     database = Database()
     driver = webdriver.Chrome()
-    topniszon = Topniszon(database, driver, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+    topniszon = Topniszon(database=database, leaderboard=mock_leaderboard, driver=driver, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
     return topniszon
 
 
@@ -95,14 +103,6 @@ def mock_leaderboard_list():
     }
     ]
 
-
-
-@pytest.fixture(scope='module')
-def mock_leaderboard(mock_leaderboard_list):
-    database = Database()
-    leaderboard = Leaderboard(database, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
-    leaderboard.leaderboard = mock_leaderboard_list
-    return leaderboard
 
 
 

@@ -2,6 +2,7 @@ import os
 from time import gmtime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from command_modules.korniszon_module import leaderboard
 from sql_database import Database
 from command_modules.korniszon_module.leaderboard import Leaderboard
 from datetime import datetime
@@ -12,8 +13,9 @@ from typing import Optional
 class Topniszon:
 
 
-    def __init__(self, database: Database, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
+    def __init__(self, database: Database, leaderboard: Leaderboard, driver: Optional[webdriver.Chrome] = None, wait_find_input_and_send_keys=wait_find_input_and_send_keys):
         self.database = database
+        self.leaderboard = leaderboard
         self.driver = driver
         self.day_input = None
         self.wait_find_input_and_send_keys = wait_find_input_and_send_keys
@@ -40,6 +42,18 @@ class Topniszon:
 
 
 
+    def _query(self, table, score_order='DESC'):
+        query = f"""
+                SELECT *
+                FROM {table}
+                WHERE created LIKE %s
+                ORDER BY score {score_order}, created ASC
+                LIMIT 1
+                """
+        return query
+
+
+
 
     def best_korniszon_by_day(self, day_input, best=True, datetime_now=None):
 
@@ -63,20 +77,16 @@ class Topniszon:
         month_now = datetime_now.month
         table = os.getenv('MAIN_TABLE_NAME')
 
-        view_name = ''
         if best:
-            view_name = 'topniszon'
+            score_order = 'DESC'
         else:
-            view_name = 'worstniszon'
+            score_order = 'ASC'
 
 
-        query = f"""
-                SELECT *
-                FROM {table}_{view_name}
-                WHERE created LIKE %s
-                ORDER BY created DESC
-                """
         date_pattern = f"{year_now}-{month_now:02d}-{self.day_input:02d}%"
+        query = self._query(table, score_order)
+
+
         print(f"Searching with date pattern: {date_pattern}")
         print(f"datetime.now: {datetime.now()}")
         
@@ -97,8 +107,9 @@ class Topniszon:
             response = f"Najgorszy {when} <wyśmiewacz>\n"
 
 
-        position = topek['position']
+        
         input = topek['input']
+        position = self.leaderboard.get_position(input)
         score = topek['score']
         user = topek['user']
 

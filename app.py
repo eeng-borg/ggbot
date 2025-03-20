@@ -21,9 +21,10 @@ leaderboard_obj = Leaderboard(database)
 
 def _get_total_items():
     # Get total count without loading all data
+    table = os.getenv('MAIN_TABLE_NAME')
     total_query = f"""
-        SELECT COUNT(*) as total 
-        FROM {os.getenv('MAIN_TABLE_NAME')}_with_position
+        SELECT COUNT(*) as total
+        FROM {table}
         """
 
     # in case database is empty

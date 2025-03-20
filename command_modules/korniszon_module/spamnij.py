@@ -19,7 +19,7 @@ class Spamnij():
 
         self.quantity = 1
         self.lenght = 1
-        self.emota = False
+        self.emotka = False
         self.exception_response = ""
 
 
@@ -33,11 +33,11 @@ class Spamnij():
         print(f"input: {input}")
         print(f"parameters: {parameters}, len: {len(parameters)}")
 
-        # remove emota from input so input is a list is always beteewen 1 and 2
-        if "emota" in parameters:
+        # remove emotka from input so input is a list is always beteewen 1 and 2
+        if "emotka" in parameters:
 
-            self.emota = True
-            parameters.remove("emota")
+            self.emotka = True
+            parameters.remove("emotka")
 
         # check if input is a number
         if len(parameters) == 2:
@@ -69,7 +69,7 @@ class Spamnij():
         #defauly values
         self.quantity = 1
         self.lenght = 1
-        self.emota = False
+        self.emotka = False
 
 
         if translate_input is None:
@@ -87,7 +87,7 @@ class Spamnij():
         table = os.getenv('MAIN_TABLE_NAME')
         query = f"""
                 SELECT input
-                FROM {table}_with_position
+                FROM {table}
                 ORDER BY RAND()
                 LIMIT {self.lenght}
                 """
@@ -99,9 +99,9 @@ class Spamnij():
                 print(f"Spam: {results}")
                 response = ' '.join(result[0] for result in results)
                 
-                if self.emota:
-                    emota_str = f" {random.choice(consts.emotes)}"
-                    response += emota_str
+                if self.emotka:
+                    emotka_str = f" {random.choice(consts.emotes)}"
+                    response += emotka_str
 
                 print(f"response: {response}")
                 self.wait_find_input_and_send_keys(self.driver, 1, By.ID, "chat-text", response)

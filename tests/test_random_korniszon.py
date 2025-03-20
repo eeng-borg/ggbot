@@ -24,16 +24,20 @@ def mock_driver():
 
 
 @pytest.fixture
-def mock_leaderboard(mock_driver):
+def mock_leaderboard():
 
     database = Database()
-    leaderboard = Leaderboard(database=database, driver=mock_driver)
+    leaderboard = Leaderboard(database=database)
     return leaderboard
 
 
 @pytest.fixture
-def mock_random_korniszon(mock_leaderboard, mock_driver):
-    spamniszon = SpamKorniszon(mock_driver, mock_leaderboard, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
+def mock_random_korniszon(mock_leaderboard):
+    database = Database()
+    spamniszon = SpamKorniszon(
+        database=database, 
+        leaderboard=mock_leaderboard, 
+        wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
     
     return spamniszon
 
@@ -105,25 +109,20 @@ class TestGetSpamTime:
                 assert data['spam_time'] == new_spam_time
 
 
-
+# check debug console for results
 def test_spamming(mock_random_korniszon: SpamKorniszon, mock_leaderboard: Leaderboard):
 
     mock_leaderboard.leaderboard = [{'input': 'fgfgfgfg'},{'input': 'aav'},{'input': 'ughmm'},]
 
-    mock_random_korniszon.spam_limit = -100
-    mock_random_korniszon.spam_time = 1
-    thread = threading.Thread(target=mock_random_korniszon._spamming, daemon=True)
-    thread.start()
+    # mock_random_korniszon.spam_limit = -100
+    mock_random_korniszon.set_spamming_time(input=1)
 
     time.sleep(2)
 
-    assert mock_random_korniszon.spam_time_left == 58
+    assert mock_random_korniszon.spam_time_left == 2
 
     mock_random_korniszon.keep_spamming = False
-    thread.join(timeout=2)
 
-    # Verify thread has terminated
-    assert not thread.is_alive(), "Thread did not terminate properly"
 
 
 

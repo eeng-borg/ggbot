@@ -46,8 +46,9 @@ class Leaderboard:
         
         # Build base query
         query = f"""
-            SELECT *
-            FROM {table}_with_position
+            SELECT *,
+            ROW_NUMBER() OVER (ORDER BY score DESC, created ASC) AS position
+            FROM {table}
                 """
         
         # Initialize params list
@@ -127,13 +128,17 @@ class Leaderboard:
 
         table = os.getenv('MAIN_TABLE_NAME')
         query = f"""
-                SELECT position
-                FROM {table}_with_position
+                SELECT position 
+                FROM (
+                    SELECT 
+                        ROW_NUMBER() OVER (ORDER BY score DESC, created ASC) AS position,
+                        input
+                    FROM {table}
+                ) ranked_table
                 WHERE input COLLATE utf8mb4_bin = %s
                 """
 
         position = self.database.fetch(query, (korniszon_input,), fetch_one=True)
-
         return position
 
         

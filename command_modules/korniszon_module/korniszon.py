@@ -1,3 +1,4 @@
+from typing import Optional
 from utils.utilities import wait_find_input_and_send_keys
 from selenium.webdriver.common.by import By
 from selenium import webdriver
@@ -11,7 +12,7 @@ from sql_database import Database
 
 class Korniszon:
 
-    def __init__(self, database: Database, driver: webdriver.Chrome, leaderboard: Leaderboard):
+    def __init__(self, database: Database, leaderboard: Leaderboard, driver: Optional[webdriver.Chrome] = None):
         self.database = database
         self.driver = driver
         self.leaderboard = leaderboard

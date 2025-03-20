@@ -17,21 +17,21 @@ def mock_spamnij():
     return Spamnij(database, wait_find_input_and_send_keys=dummy_wait_find_input_and_send_keys)
 
 
-@pytest.mark.parametrize("input, exception, exception_msg, quantity, lenght, emota", [
+@pytest.mark.parametrize("input, exception, exception_msg, quantity, lenght, emotka", [
     ("5 3", None, "", 5, 3, False),
-    ("2 4 emota", None, "", 2, 4, True),
-    ("emota 5 3", None, "", 5, 3, True),
+    ("2 4 emotka", None, "", 2, 4, True),
+    ("emotka 5 3", None, "", 5, 3, True),
     ("2h 4", True, "Pierwsze dwa inputy muszą być liczbowe :).", 1, 1, False),
     ("2h 4 7", True, "Dej dwa inputy z liczbami kierowniku <prosi>.", 1, 1, False),
     ("2-4", True, "Dej dwa inputy z liczbami kierowniku <prosi>.", 1, 1, False),
     ("2.5 4.1", True, "Pierwsze dwa inputy muszą być liczbowe :).", 1, 1, False),
 ])
-def test_translate_input(mock_spamnij, input, exception, exception_msg, quantity, lenght, emota):
+def test_translate_input(mock_spamnij, input, exception, exception_msg, quantity, lenght, emotka):
 
     result = mock_spamnij._translate_input(input)
     assert result is exception
     assert mock_spamnij.exception_response == exception_msg
     assert mock_spamnij.quantity == quantity
     assert mock_spamnij.lenght == lenght
-    assert mock_spamnij.emota is emota
+    assert mock_spamnij.emotka is emotka
 

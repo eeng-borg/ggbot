@@ -74,10 +74,10 @@ class Database:
                     print("All connection attempts failed")
                     return None  # Explicitly return None after all retries
 
-    def fetch(self, query, params=None, dictionary=False, fetch_one=False):
-        
-        connection = None
 
+
+    def fetch(self, query, params=None, dictionary=False, fetch_one=False):
+        connection = None
         try:
             connection = self._get_connection()
             if connection is None:
@@ -86,22 +86,16 @@ class Database:
             cursor = connection.cursor(dictionary=dictionary)
             cursor.execute(query, params)
             
-            
             if fetch_one is False:
                 result = cursor.fetchall()
-
             else:
-
                 fetched_result = cursor.fetchone()
-
                 if fetched_result is None:
                     result = None
-
                 elif dictionary:
-                    result = fetched_result  # Return the entire dictionary
-
+                    result = fetched_result
                 else:
-                    result = fetched_result[0]  # Access first element only if not None
+                    result = fetched_result[0]
 
             cursor.close()
             return result
@@ -111,8 +105,12 @@ class Database:
             raise
 
         finally:
-            if connection:
-                connection.close()  # Return connection to pool
+            try:
+                if connection and connection.is_connected():
+                    connection.close()
+            except errors.Error:
+                pass  # Ignore errors during connection cleanup
+
 
     def commit(self, query, params=None):
         connection = None
